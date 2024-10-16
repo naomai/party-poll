@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Question extends Model {
     use HasFactory;
 
+    protected $appends = ['url'];
+
     public function poll(): BelongsTo {
         return $this->belongsTo(Poll::class);
     }
@@ -20,7 +22,7 @@ class Question extends Model {
 
     protected function responseParams(): Attribute {
         return Attribute::make(
-            get: fn (string $json) => json_decode($json),
+            get: fn (string $json) => json_decode($json, true),
             set: fn (array $obj) => json_encode($obj),
         );
     }
