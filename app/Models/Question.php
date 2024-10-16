@@ -24,4 +24,8 @@ class Question extends Model {
             set: fn (array $obj) => json_encode($obj),
         );
     }
+
+    public function getUrlAttribute(): string {
+        return route("poll.question.get", $this->id);
+    }
 }

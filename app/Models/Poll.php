@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Poll extends Model {
     use HasFactory;
 
+    protected $appends = ['url_questions', 'url_state'];
+
     public function questions(): HasMany {
         return $this->hasMany(Question::class);
     }
@@ -25,5 +27,12 @@ class Poll extends Model {
             'poll_id', 'id',
             'id', 'user_id'
         );
+    }
+
+    public function getUrlQuestionsAttribute(): string {
+        return route("poll.question.list", $this->id);
+    }
+    public function getUrlStateAttribute(): string {
+        return route("poll.state", $this->id);
     }
 }
