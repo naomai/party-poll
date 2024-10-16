@@ -62,7 +62,12 @@ class PollStateService {
     }
 
     public static function getAccessibleQuestions(PollParticipant $participation): Collection {
-        
-        $questions = static::getPollQuestions($participation)->get();
+        $lastAccessible = static::getCurrentQuestion($participation);
+        $questions = static::getPollQuestions($participation)
+            ->get()
+            ->filter(fn($question) =>
+                $question->poll_sequence_id <= $lastAccessible->poll_sequence_id
+            );
+        return $questions;
     }
 }

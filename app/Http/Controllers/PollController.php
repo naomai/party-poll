@@ -36,8 +36,12 @@ class PollController extends Controller {
         return response()->json($poll);
     }
 
-    public function questions(Poll $poll): JsonResponse {
-        return response()->json($poll->questions);
+    public function questions(Poll $poll, PollStateService $service): JsonResponse {
+        //$questions = $poll->questions;
+        $user = Auth::user();
+        $participation = $service->getPollParticipation($poll, $user);
+        $questions = $service->getAccessibleQuestions($participation);
+        return response()->json($questions);
     }
 
 
