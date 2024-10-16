@@ -10,6 +10,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class PollParticipant extends Model {
     use HasFactory;
 
+    protected $hidden = [
+        'poll', 'user', 'updated_at',
+        /* 'id', 'user_id', */
+    ];
+
     public function poll(): BelongsTo {
         return $this->belongsTo(Poll::class);
     }
