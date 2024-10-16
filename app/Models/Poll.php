@@ -21,6 +21,10 @@ class Poll extends Model {
         return $this->belongsTo(User::class);
     }
 
+    public function participations(): HasMany {
+        return $this->hasMany(PollParticipant::class);
+    }
+
     public function users(): HasManyThrough {
         return $this->hasManyThrough(
             User::class, PollParticipant::class, 
