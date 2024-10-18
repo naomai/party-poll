@@ -5,20 +5,21 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GuestUpgradeRequest;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
 class GuestAccountController extends Controller {
-    public function login(Request $request): Response {
+    public function login(): JsonResponse {
         $guest = User::create([
             'name' => static::generateRandomName(),
         ]);
 
         Auth::login($guest, remember: true);
         session()->regenerate();
-        return response('', 201);
+        return response()->json($guest, 201);
     }
 
     public function store(GuestUpgradeRequest $request): Response {
