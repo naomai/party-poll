@@ -22,7 +22,7 @@ Route::group([
         
         Route::group([
             'prefix' => '{poll}', 
-            'middleware' => 'can:view,poll'
+            'middleware' => 'can:view,poll',
             ], function () {
                 Route::get('', [PollController::class, 'get'])
                     ->name("poll.get");
@@ -39,7 +39,8 @@ Route::group([
 );
 
 Route::group([
-    'prefix' => '/questions/{question}'
+    'prefix' => '/questions/{question}',
+    'middleware' => ['auth:sanctum', 'can:view, poll'],
     ], function () { 
         Route::get('', [QuestionController::class, 'get'])
             ->name("poll.question.get");
