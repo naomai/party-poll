@@ -33,6 +33,20 @@ class Poll extends Model {
         );
     }
 
+    // ------
+
+    public function getUserParticipation(User $user): ?PollParticipant {
+        $particiaption = $this->participations
+            ->where('user_id', '=', $user->id)
+            ->first();
+        return $particiaption;
+    }
+
+    public function hasParticipant(User $user): bool {
+        $particiaption = $this->getUserParticipation($user);
+        return $particiaption !== null;
+    }
+
     public function getUrlQuestionsAttribute(): string {
         return route("poll.question.list", $this->id);
     }
