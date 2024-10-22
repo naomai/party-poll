@@ -17,27 +17,8 @@ class PollStateService {
         ])->first();
     }
 
-    public static function getCurrentQuestion(PollParticipant $participation): Question {
-        /** @var Poll */
-        $poll = $participation->poll;
-        $isWaitForAll = $poll->wait_for_everybody;
-        $userId = $participation->user->id;
-
-        $questionStates = static::getQuestionAnswerPairs($participation);
-        
-        if($isWaitForAll) {
-            $questions = static::getPollQuestions($participation);
-            $sequenceId = $poll->sequence_id;
-            $question = $questions
-                ->where('sequence_id', "=", $sequenceId)
-                ->first();
-        } else {
-            $firstWithoutAnswer = $questionStates->first(
-                fn($state) => $state['answer']==null
-            );
-            $question = $firstWithoutAnswer['question'];
-        }
-
+    public static function getCurrentQuestion(PollParticipant $participation): ?Question {
+        $question = static::getAccessibleQuestions($participation)->last();
         return $question;
     }
 
@@ -61,13 +42,37 @@ class PollStateService {
 
     }
 
-    public static function getAccessibleQuestions(PollParticipant $participation): Collection {
-        $lastAccessible = static::getCurrentQuestion($participation);
+    public static function getAccessibleQuestions(PollParticipant $participation): ?Collection {
+        /** @var Poll */
+        $poll = $participation->poll;
+        $isWaitForAll = $poll->wait_for_everybody;
+        $canSeeAll = 
+            $participation->can_modify_poll ||
+            $participation->can_see_progress ||
+            $participation->can_control_progress;
+        
+        
         $questions = static::getPollQuestions($participation)
-            ->get()
-            ->filter(fn($question) =>
-                $question->poll_sequence_id <= $lastAccessible->poll_sequence_id
+            ->where(
+                'poll_sequence_id', "<=", $poll->published_sequence_id
             );
-        return $questions;
+
+        if($isWaitForAll) {
+            $sequenceId = $poll->sequence_id;
+        } else {
+            $questionStates = static::getQuestionAnswerPairs($participation);
+
+            $firstWithoutAnswer = $questionStates->first(
+                fn($state) => $state['answer']==null
+            );
+            $sequenceId = $firstWithoutAnswer['question']->poll_sequence_id;
+        }
+
+        if($sequenceId === null) {
+            return null;
+        }
+
+        return $questions->where('poll_sequence_id', '<=', $sequenceId)->get();
     }
+
 }
