@@ -13,6 +13,18 @@ class Poll extends Model {
 
     protected $appends = ['url_questions', 'url_state'];
 
+    public static function booted(): void {
+        self::created(function(Poll $poll){
+            PollParticipant::create([
+                'poll_id' => $poll->id,
+                'user_id' => $poll->owner_id,
+                'can_modify_poll' =>    1,
+                'can_control_flow' =>   1,
+                'can_see_progress' =>   1,
+            ]);
+        });
+    }
+
     public function questions(): HasMany {
         return $this->hasMany(Question::class);
     }
