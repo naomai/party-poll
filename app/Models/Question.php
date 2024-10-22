@@ -12,6 +12,15 @@ class Question extends Model {
 
     protected $appends = ['url'];
 
+    public static function booting() {
+        self::creating(function(Question $question) {
+            $seqIdMax = Question::where('poll_id', '=', $question->poll_id)
+                ->max('poll_sequence_id'); 
+            $question->poll_sequence_id = $seqIdMax + 1;
+            return true;
+        });
+    }
+
     public function poll(): BelongsTo {
         return $this->belongsTo(Poll::class);
     }
@@ -19,6 +28,7 @@ class Question extends Model {
     public function owner(): BelongsTo {
         return $this->belongsTo(User::class);
     }
+    
 
     protected function responseParams(): Attribute {
         return Attribute::make(
