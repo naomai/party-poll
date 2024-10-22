@@ -33,7 +33,7 @@ class Poll extends Model {
         return $this->belongsTo(User::class);
     }
 
-    public function participations(): HasMany {
+    public function pollParticipants(): HasMany {
         return $this->hasMany(PollParticipant::class);
     }
 
@@ -48,15 +48,15 @@ class Poll extends Model {
     // ------
 
     public function getUserParticipation(User $user): ?PollParticipant {
-        $particiaption = $this->participations
+        $participation = $this->pollParticipants
             ->where('user_id', '=', $user->id)
             ->first();
-        return $particiaption;
+        return $participation;
     }
 
     public function hasParticipant(User $user): bool {
-        $particiaption = $this->getUserParticipation($user);
-        return $particiaption !== null;
+        $participation = $this->getUserParticipation($user);
+        return $participation !== null;
     }
 
     public function getUrlQuestionsAttribute(): string {
