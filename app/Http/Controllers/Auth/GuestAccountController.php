@@ -23,9 +23,9 @@ class GuestAccountController extends Controller {
         ]);
 
         Auth::login($guest, remember: true);
-        session()->regenerate();
+        session()->regenerate();        
 
-        return response()->json($guest, 201);
+        return response()->json($guest, 201); 
     }
 
     public function store(GuestUpgradeRequest $request): Response {
@@ -183,10 +183,10 @@ class GuestAccountController extends Controller {
         ];
 
         $randomAnimal = $animals[array_rand($animals)];
-        $randomColor = $animals[array_rand($colors)];
+        $randomColor = $colors[array_rand($colors)];
 
         return "{$randomColor} {$randomAnimal}";
     }
 
-    // based on: https://www.cardboardmachete.com/blog/anonymous-"users",
+    // based on: https://www.cardboardmachete.com/blog/anonymous-users
 }
