@@ -11,7 +11,7 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::get('/create_guest_profile', [GuestAccountController::class, 'login']);
+Route::get('/guest', [GuestAccountController::class, 'login']);
 
 
 Route::group([
