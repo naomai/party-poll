@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Question;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -47,12 +48,13 @@ class QuestionFactory extends Factory {
                 break;
         }
 
+        $seqId = Question::max('poll_sequence_id') + 1;
+
         return [
             'owner_id'=>User::all()->random()->id,
             'question'=>fake()->sentence(),
-            'type'=>$questionType,
-            'response_params'=>$responseParams,
-            'poll_sequence_id'=>fake()->numberBetween(0, 999),
+            'type' =>               $questionType,
+            'response_params' =>    $responseParams,
         ];
     }
 }
