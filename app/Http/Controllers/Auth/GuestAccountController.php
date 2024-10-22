@@ -13,12 +13,18 @@ use Illuminate\Support\Facades\Auth;
 
 class GuestAccountController extends Controller {
     public function login(): JsonResponse {
+        $account = Auth::user();
+        if($account !== null) {
+            return response()->json($account, 200);
+        }
+
         $guest = User::create([
             'name' => static::generateRandomName(),
         ]);
 
         Auth::login($guest, remember: true);
         session()->regenerate();
+
         return response()->json($guest, 201);
     }
 
