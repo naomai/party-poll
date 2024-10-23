@@ -11,10 +11,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Poll extends Model {
     use HasFactory;
 
-    protected $appends = ['url_questions', 'url_state'];
+    protected $fillable = [
+        'title',
+        'enable_link_invite',
+        'close_after_start',
+        'wait_for_everybody',
+        'enable_revise_response',
+        'show_question_results',
+        'show_question_answers',
+        'show_end_results',
+        'show_end_answers',
+    ];
 
     public static function booted(): void {
         self::created(function(Poll $poll){
+            Model::unguard();
             PollParticipant::create([
                 'poll_id' => $poll->id,
                 'user_id' => $poll->owner_id,
@@ -22,6 +33,7 @@ class Poll extends Model {
                 'can_control_flow' =>   1,
                 'can_see_progress' =>   1,
             ]);
+            Model::reguard();
         });
     }
 
@@ -59,10 +71,4 @@ class Poll extends Model {
         return $participation !== null;
     }
 
-    public function getUrlQuestionsAttribute(): string {
-        return route("poll.question.list", $this->id);
-    }
-    public function getUrlStateAttribute(): string {
-        return route("poll.state", $this->id);
-    }
 }
