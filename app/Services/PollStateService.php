@@ -23,6 +23,7 @@ class PollStateService {
     }
 
     public static function getPollQuestions(PollParticipant $participation): Builder {
+
         return Question::where('poll_id', "=", $participation->poll->id)
             ->orderBy('poll_sequence_id');
     }
@@ -45,12 +46,12 @@ class PollStateService {
     public static function getAccessibleQuestions(PollParticipant $participation): ?Collection {
         /** @var Poll */
         $poll = $participation->poll;
+        $isStarted = $poll->published_sequence_id !== null;
         $isWaitForAll = $poll->wait_for_everybody;
-        $canSeeAll = 
-            $participation->can_modify_poll ||
-            $participation->can_see_progress ||
-            $participation->can_control_progress;
-        
+
+        if(!$isStarted) {
+            return collect([]);
+        }
         
         $questions = static::getPollQuestions($participation)
             ->where(
