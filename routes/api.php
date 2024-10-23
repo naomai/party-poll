@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Api\AnswerController;
 use App\Http\Controllers\Auth\GuestAccountController;
-use App\Http\Controllers\PollController;
+use App\Http\Controllers\Api\PollManagementController;
+use App\Http\Controllers\Api\PollProgressController;
+use App\Http\Controllers\Api\QuestionManagementController;
 use App\Http\Controllers\QuestionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -14,41 +16,37 @@ Route::get('/user', function (Request $request) {
 Route::get('/guest', [GuestAccountController::class, 'login']);
 
 
+
 Route::group([
-    'prefix' => '/polls', 
     'middleware' => 'auth:sanctum'
     ], function () {
-        Route::get('/', [PollController::class, 'list'])->name("poll.list");
-        
+        Route::apiResource('/polls', PollManagementController::class);
+    
         Route::group([
-            'prefix' => '{poll}', 
+            'prefix' => '/polls/{poll}', 
             'middleware' => 'can:view,poll',
             ], function () {
-                Route::get('', [PollController::class, 'get'])
-                    ->name("poll.get");
+                Route::get('state', [PollProgressController::class, 'view'])
+                    ->name('poll.state');
 
-                Route::get('state', [PollController::class, 'state'])
-                    ->name("poll.state");
+                Route::apiResource('questions', QuestionManagementController::class)
+                    ->name('index', 'poll.question.list')
+                    ->name('show', 'poll.question.get');
 
-                Route::get('questions', [PollController::class, 'questions'])
-                    ->name("poll.question.list");
-                
+                Route::group([
+                    'prefix' => 'questions/{question}',
+                    'middleware' => ['auth:sanctum'],
+                    ], function () { 
+                        Route::get('answer', [AnswerController::class, 'show']);
+
+                        /*Route::get('participants_answers', [QuestionController::class, 'getAnswers'])
+                            ->name("poll.question.answer.list");*/
+                    }
+                );
             }
         );
     }
 );
 
-Route::group([
-    'prefix' => '/questions/{question}',
-    'middleware' => ['auth:sanctum', 'can:view, poll'],
-    ], function () { 
-        Route::get('', [QuestionController::class, 'get'])
-            ->name("poll.question.get");
 
-        Route::get('answers', [QuestionController::class, 'getAnswers'])
-            ->name("poll.question.answer.list");
-
-        Route::get('answer', [AnswerController::class, 'show']);
-    }
-);
 

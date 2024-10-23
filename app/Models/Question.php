@@ -38,6 +38,6 @@ class Question extends Model {
     }
 
     public function getUrlAttribute(): string {
-        return route("poll.question.get", $this->id);
+        return route("poll.question.get", ['poll'=>$this->poll->id, 'question'=>$this->id]);
     }
 }
