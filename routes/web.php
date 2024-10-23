@@ -1,17 +1,16 @@
 <?php
 
+use App\Http\Controllers\Api\PollManagementController;
+use App\Http\Controllers\PollIndexController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Poll;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    //$us = Poll::inRandomOrder()->first()->users();
-    $us = Poll::find(6)->users();
-    print_r($us);
-    return "";
-});
+Route::middleware(['auth:sanctum'])
+    ->get('/', [PollIndexController::class, 'view'])
+    ->name("index");
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
