@@ -54,6 +54,10 @@ class User extends Authenticatable {
     }
 
     public function polls(): HasManyThrough {
-        return $this->hasManyThrough(Poll::class, PollParticipant::class);
+        return $this->hasManyThrough(
+            Poll::class, PollParticipant::class,
+            'user_id', 'id',
+            'id', 'poll_id'
+        );
     }
 }
