@@ -30,9 +30,10 @@ class PollSeeder extends Seeder {
                     ->select('user_id')
             )->get();
 
-            $poll->pollParticipants()->create([
-                'user_id' => $usersNotAssigned->random()->id,
-            ]);
+            
+            $participation = $poll->pollParticipants()->make();
+            $participation->user_id= $usersNotAssigned->random()->id;
+            $participation->save();
         }
     }
 }
