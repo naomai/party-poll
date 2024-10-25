@@ -26,6 +26,6 @@ class PollBasicInfoResource extends JsonResource
     }
 
     public function getUrlSummaryAttribute(): string {
-        return route("polls.show", $this->id);
+        return route("api.polls.show", $this->id);
     }
 }

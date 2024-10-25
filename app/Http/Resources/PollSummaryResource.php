@@ -35,9 +35,9 @@ class PollSummaryResource extends PollBasicInfoResource {
 
     
     public function getUrlQuestionsAttribute(): string {
-        return route("poll.question.list", $this->id);
+        return route("api.poll.questions", $this->id);
     }
     public function getUrlStateAttribute(): string {
-        return route("poll.state", $this->id);
+        return route("api.poll.state", $this->id);
     }
 }
