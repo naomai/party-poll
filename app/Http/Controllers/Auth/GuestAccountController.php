@@ -5,36 +5,44 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GuestUpgradeRequest;
 use App\Models\User;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
 class GuestAccountController extends Controller {
-    public function login(): JsonResponse {
+    public function store(GuestUpgradeRequest $request): RedirectResponse {
+        $guestInfo = $request->validated();
+
         $account = Auth::user();
         if($account !== null) {
             return response()->json($account, 200);
         }
 
-        $guest = User::create([
-            'name' => static::generateRandomName(),
-        ]);
+        if(!isset($guestInfo['name'])) {
+            $guestInfo['name'] = static::generateRandomName();
+        }
+
+        if(isset($guestInfo['password'])) {
+            $guestInfo['password'] = Hash::make($request->get('password'));
+        }
+
+        $guest = User::create($guestInfo);
 
         Auth::login($guest, remember: true);
-        session()->regenerate();        
+        session()->regenerate();       
+        
+        if(session()->has('invite_poll')) {
+            $pollId = session()->get('invite_poll');
+            $invitationToken = session()->get('invite_token');
 
-        return response()->json($guest, 201); 
-    }
+            return redirect(route('invitation.consume', [
+                    'poll'=>$pollId,
+                    'token'=>$invitationToken,
+                ]
+            ));
+        }
 
-    public function store(GuestUpgradeRequest $request): Response {
-        Auth::user()->name = $request->get('name');
-        Auth::user()->email = $request->get('email');
-        Auth::user()->password = Hash::make($request->get('password'));
-        Auth::user()->save();
-    
-        return response('', 200);
+        return redirect(route("polls.index"));
     }
 
     private static function generateRandomName(): string {

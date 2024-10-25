@@ -3,8 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Password;
 
 class GuestUpgradeRequest extends FormRequest
 {
@@ -12,7 +12,7 @@ class GuestUpgradeRequest extends FormRequest
      * Determine if the user is authorized to make this request.
      */
     public function authorize() {
-        return Auth::user()->isGuest;
+        return !Auth::check() || Auth::user()->email == null;
     }
 
     /**
@@ -22,9 +22,9 @@ class GuestUpgradeRequest extends FormRequest
      */
     public function rules(): array {
         return [
-            'name'=>['required', 'string', 'max:60'],
-            'email'=>['required', 'email', 'max:100'],
-            'password' => ['required', 'confirmed', Password::min(8)],
+            'name'=>['string', 'max:60'],
+            'email'=>['email', 'max:100'],
+            'password' => ['required_with:email', 'confirmed', Password::min(8)],
         ];
     }
 }

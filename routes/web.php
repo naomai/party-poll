@@ -1,16 +1,19 @@
 <?php
 
-use App\Http\Controllers\Api\PollManagementController;
-use App\Http\Controllers\Web\PollIndexController;
+use App\Http\Controllers\Auth\GuestAccountController;
+use App\Http\Controllers\Web\OnboardingController;
+use App\Http\Controllers\Web\PollManagementController;
 use App\Http\Controllers\Web\ProfileController;
-use App\Models\Poll;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+
+Route::get('/', [OnboardingController::class, 'view'])
+    ->name("index");
+
+Route::put("/guest_upgrade", [GuestAccountController::class, 'store'])
+    ->name("guest_upgrade");
 
 Route::middleware(['auth:sanctum'])->group(function(){
-    Route::get('/', [PollIndexController::class, 'view'])
-        ->name("index");
+    Route::resource('/polls', PollManagementController::class);
 });
     
 
