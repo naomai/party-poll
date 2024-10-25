@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\PollManagementController;
-use App\Http\Controllers\PollIndexController;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Web\PollIndexController;
+use App\Http\Controllers\Web\ProfileController;
 use App\Models\Poll;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
