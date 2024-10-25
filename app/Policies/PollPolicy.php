@@ -17,7 +17,7 @@ class PollPolicy {
         return $poll->hasParticipant($user);
     }
     
-    public function create(User $user): bool {
+    public function store(User $user): bool {
         return true;
     }
     
