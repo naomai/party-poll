@@ -13,6 +13,11 @@ const props = defineProps({
     poll: [Object],
 });
 
+defineEmits([
+    'create',
+    'save',
+])
+
 const isCreatingPoll = computed(()=>{
     return props.poll.id===null;
 });
@@ -24,7 +29,7 @@ const form = useForm(props.poll);
 const submitPollProperties = () => {
     if(isCreatingPoll) {
         form.post(route('polls.store'), {
-            onFinish: () => form.reset('title'),
+            onSuccess: () => emit('create')
         });
     } else {
         form.patch(route('polls.update'), {
