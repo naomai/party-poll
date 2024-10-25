@@ -13,10 +13,6 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::get('/guest', [GuestAccountController::class, 'login']);
-
-
-
 Route::group([
     'middleware' => 'auth:sanctum',
     'as' => 'api.',
