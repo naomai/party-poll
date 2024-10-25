@@ -18,18 +18,31 @@ class PollManagementController extends Controller {
         return response()->json($index);   
     }
 
-    public function store(PollInfoUpdateRequest $request, PollManagementService $manage) : JsonResponse {
+    public function store(
+        PollInfoUpdateRequest $request, 
+        PollManagementService $manage
+    ) : JsonResponse {
+
         $pollSummary = $manage->store($request->validated());
         return response()->json($pollSummary);
     }
     
-    public function show(Poll $poll, PollManagementService $manage): JsonResponse {
+    public function show(
+        Poll $poll, 
+        PollManagementService $manage
+    ): JsonResponse {
+
         $pollSummary = $manage->show($poll);
         return response()->json($pollSummary);
     }
 
-    public function update(PollInfoUpdateRequest $request, Poll $poll) {
-        $pollSummary = $poll->update($request->validated());
+    public function update(
+        Poll $poll, 
+        PollInfoUpdateRequest $request, 
+        PollManagementService $manage
+    ): JsonResponse {
+        
+        $pollSummary = $manage->update($poll, $request->validated());
         return response()->json($pollSummary);
     }
     
