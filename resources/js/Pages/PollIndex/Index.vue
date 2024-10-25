@@ -19,6 +19,7 @@ const inPollInfoEditor = ref(false);
 const pollToEdit = ref({
     title: "",
     id: null,
+    wait_for_everybody: false,
 });
 
 const hasPolls = computed(()=>
