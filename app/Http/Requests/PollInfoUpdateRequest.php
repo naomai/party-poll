@@ -17,6 +17,7 @@ class PollInfoUpdateRequest extends FormRequest {
             'title' => ['required', 'string', 'max:255'],
             'enable_link_invite' => ['boolean'],
             'close_after_start' => ['boolean'],
+            'wait_for_everybody' => ['boolean'],
             'enable_revise_response' => ['boolean'],
             'show_question_results' => ['boolean'],
             'show_question_answers' => ['boolean'],
