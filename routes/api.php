@@ -27,7 +27,7 @@ Route::group([
                     ->name('poll.state');
 
                 Route::apiResource('questions', QuestionManagementController::class)
-                    ->name('index', 'question.list')
+                    ->name('index', 'poll.questions')
                     ->name('show', 'question.get');
 
                 Route::group([
@@ -44,7 +44,7 @@ Route::group([
             }
         );
     }
-)->name('api.');
+);
 
 
 
