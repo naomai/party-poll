@@ -18,7 +18,8 @@ Route::get('/guest', [GuestAccountController::class, 'login']);
 
 
 Route::group([
-    'middleware' => 'auth:sanctum'
+    'middleware' => 'auth:sanctum',
+    'as' => 'api.',
     ], function () {
         Route::apiResource('/polls', PollManagementController::class);
     
@@ -30,14 +31,15 @@ Route::group([
                     ->name('poll.state');
 
                 Route::apiResource('questions', QuestionManagementController::class)
-                    ->name('index', 'poll.question.list')
-                    ->name('show', 'poll.question.get');
+                    ->name('index', 'question.list')
+                    ->name('show', 'question.get');
 
                 Route::group([
                     'prefix' => 'questions/{question}',
                     'middleware' => ['auth:sanctum'],
                     ], function () { 
-                        Route::get('answer', [AnswerController::class, 'show']);
+                        Route::get('answer', [AnswerController::class, 'view'])
+                            ->name('question.answer');
 
                         /*Route::get('participants_answers', [QuestionController::class, 'getAnswers'])
                             ->name("poll.question.answer.list");*/
@@ -46,7 +48,7 @@ Route::group([
             }
         );
     }
-);
+)->name('api.');
 
 
 
