@@ -16,7 +16,7 @@ class PollIndexController extends Controller {
     public function view(User $user) {
         $this->authorize('index', Poll::class);
         $list = $this->getAllPollsForUser()->get();
-        return Inertia::render("PollIndex", [
+        return Inertia::render("PollIndex/Index", [
             'polls' => PollBasicInfoResource::collection($list),
         ]);
     }
