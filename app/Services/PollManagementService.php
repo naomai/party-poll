@@ -26,10 +26,18 @@ class PollManagementService {
         return new PollSummaryResource($poll);
     }
 
-    public function show(Poll $poll): JsonResource {
+    public function show(Poll $poll): Array {
         Gate::authorize('view', $poll);
 
-        return new PollSummaryResource($poll);
+        $user = Auth::user();
+
+        $response = [];
+
+        $response['info'] = new PollSummaryResource($poll);
+        $response['questions'] = self::getQuestionList($poll);
+        $response['participation'] = PollStateService::getPollParticipation($poll, $user); 
+
+        return $response;
     }
 
     public function update(Poll $poll, Array $pollData): JsonResource {
@@ -41,6 +49,32 @@ class PollManagementService {
 
     public function destroy(string $id) {
         //
+    }
+
+    private static function getQuestionList(Poll $poll) {
+        $user = Auth::user();
+        $participation = PollStateService::getPollParticipation($poll, $user);
+
+        $canSeeAll = 
+            $participation->can_control_flow ||
+            $participation->can_see_progress ||
+            $participation->can_modify_poll;
+
+        if($canSeeAll) {
+            $lastSeqId = $poll->sequence_id;
+            $questions = $poll->questions->map(function($q) use($lastSeqId) { 
+                $q['revealed'] = $q->poll_sequence_id <= $lastSeqId;
+                return $q;
+            });
+            
+        }else{
+            $questions = PollStateService::getAccessibleQuestions($participation)->toArray();
+            $questions = $poll->questions->map(function($q) { 
+                $q['revealed'] = true;
+                return $q;
+            });
+        }
+        return $questions;
     }
 
     private function getAllPollsForUser() {

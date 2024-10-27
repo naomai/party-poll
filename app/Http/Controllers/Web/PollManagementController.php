@@ -37,10 +37,8 @@ class PollManagementController extends Controller {
         PollManagementService $manage
     ): InertiaResponse {
 
-        $pollSummary = $manage->show($poll);
-        return Inertia::render("Poll/Summary", [
-            'poll' => $pollSummary
-        ]);
+        $pollDetails = $manage->show($poll);
+        return Inertia::render("Poll/Summary", $pollDetails);
     }
 
     public function update(
