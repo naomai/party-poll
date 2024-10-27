@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Models\Poll;
@@ -10,11 +10,13 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class QuestionManagementController extends Controller {
     use AuthorizesRequests;
     
-    public function index(Poll $poll, PollStateService $service): JsonResponse {
+    public function index(Poll $poll, PollStateService $service): Response {
         //$this->authorize('index', Question::class);
         $user = Auth::user();
         $participation = $service->getPollParticipation($poll, $user);
@@ -25,11 +27,21 @@ class QuestionManagementController extends Controller {
             $participation->can_modify_poll;
 
         if($canSeeAll) {
-            $questions = $poll->questions->toArray();
+            $lastSeqId = $poll->sequence_id;
+            $questions = $poll->questions->map(function($q) use($lastSeqId) { 
+                $q['revealed'] = $q->poll_sequence_id <= $lastSeqId;
+                return $q;
+            });
+            
         }else{
             $questions = $service->getAccessibleQuestions($participation)->toArray();
         }
-        return response()->json($questions);
+        
+
+
+        return Inertia::render('questions.index', [
+            'questions'=>$questions
+        ]);
     }
 
 
