@@ -3,6 +3,7 @@ namespace App\Services;
 
 use App\Http\Resources\PollBasicInfoResource;
 use App\Http\Resources\PollSummaryResource;
+use App\Http\Resources\QuestionResource;
 use App\Models\Poll;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
@@ -54,7 +55,7 @@ class PollManagementService {
     private static function getQuestionList(Poll $poll) {
         $user = Auth::user();
         $participation = PollStateService::getPollParticipation($poll, $user);
-
+        
         $canSeeAll = 
             $participation->can_control_flow ||
             $participation->can_see_progress ||
@@ -63,18 +64,18 @@ class PollManagementService {
         if($canSeeAll) {
             $lastSeqId = $poll->sequence_id;
             $questions = $poll->questions->map(function($q) use($lastSeqId) { 
-                $q['revealed'] = $q->poll_sequence_id <= $lastSeqId;
+                $q->revealed = $q->poll_sequence_id <= $lastSeqId;
                 return $q;
             });
             
         }else{
-            $questions = PollStateService::getAccessibleQuestions($participation)->toArray();
-            $questions = $poll->questions->map(function($q) { 
-                $q['revealed'] = true;
+            $questions = PollStateService::getAccessibleQuestions($participation);
+            $questions = $questions->map(function($q) { 
+                $q->revealed = true;
                 return $q;
             });
         }
-        return $questions;
+        return QuestionResource::collection($questions);
     }
 
     private function getAllPollsForUser() {
