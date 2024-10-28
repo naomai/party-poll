@@ -12,7 +12,7 @@ class QuestionService {
         Gate::authorize('view', $question);
         Gate::authorize('answer', $question->poll);
 
-        $validated = $request->validate(['answer'=>static::getValidatorForQuestion($question)]);
+        $validated = $request->validate(static::getValidatorForQuestion($question));
 
         $answerRecord = [
             'question_id' => $question->id,
@@ -34,19 +34,19 @@ class QuestionService {
         switch($question->type) {
             case 'text':
                 $maxLen = (int)$params->max_length;
-                return ["required", "max:{$maxLen}"];
+                return ['answer.input'=>["required", "max:{$maxLen}"]];
             case 'range':
                 $min = (int)$params->min;
                 $max = (int)$params->max;
-                return ["required", "integer", "gte:{$min}", "lte:{$max}"];
+                return ['answer.input'=>["required", "integer", "gte:{$min}", "lte:{$max}"]];
             case 'rating':
-                return ["required", "numeric", "gte:0.5", "lte:5"];
+                return ['answer.input'=>["required", "numeric", "gte:0.5", "lte:5"]];
             case 'select':
                 $maxSelected = $params->max_selected;
                 if($maxSelected == 0) {
                     $maxSelected = count($params->options);
                 }
-                return ["required", "array", "gte:1", "lte:{$maxSelected}"];
+                return ['answer.selected'=>["required", "array", "gte:1", "lte:{$maxSelected}"]];
         }
     }
 }
