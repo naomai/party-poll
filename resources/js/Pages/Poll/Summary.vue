@@ -6,6 +6,8 @@ import { computed, reactive } from 'vue';
 import PollPropertiesForm from '../PollManagement/PollPropertiesForm.vue';
 import Modal from '@/Components/Modal.vue';
 import { ref } from 'vue';
+import Question from './Partials/Question.vue';
+import AllowedActions from './Partials/AllowedActions.vue';
 
 
 const page = usePage();
@@ -25,7 +27,7 @@ const canSeeAllQuestions = computed(() =>
 </script>
 
 <template>
-    <Head title="{{ info.title }}" />
+    <Head :title="info.title" />
 
     <AuthenticatedLayout>
         <template #header>
@@ -38,6 +40,8 @@ const canSeeAllQuestions = computed(() =>
 
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+
+                <AllowedActions :participation="participation"/>
                 <div
                     class="overflow-hidden bg-white shadow-sm sm:rounded-lg flex justify-center gap-6 flex-wrap"
                 >
@@ -45,14 +49,7 @@ const canSeeAllQuestions = computed(() =>
                         {{ isAdmin ? "There are no questions here. Go ahead and add some!" : "We don't have any questions yet. Come back soon!" }}
                     </div>
                     <ul v-if="hasQuestions" role="list" class="w-full divide-y  divide-gray-100 text-lg">
-                        
-                        <li v-for="question in questions" class="flex justify-between gap-x-6 py-5">
-                            <div class="flex min-w-0 gap-x-4">
-                                <div class="pl-6 min-w-0 flex-auto" :class="{'opacity-75': question.revealed}">
-                                    <p class="text-sm font-semibold leading-6 text-gray-900">{{ question.question }}</p>
-                                </div>
-                            </div>
-                        </li>
+                        <Question v-for="question in questions" :question="question"></Question>
                     </ul>
                     <div v-if="isAdmin" class="self-center py-6">
                         <ListAddButton class="" @click="inQuestion=true">New question</ListAddButton>
