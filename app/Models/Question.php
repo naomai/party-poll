@@ -10,8 +10,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Question extends Model {
     use HasFactory;
 
-    protected $appends = ['url'];
-
     public static function booting() {
         self::creating(function(Question $question) {
             $seqIdMax = Question::where('poll_id', '=', $question->poll_id)
@@ -35,9 +33,5 @@ class Question extends Model {
             get: fn (string $json) => json_decode($json, true),
             set: fn (array $obj) => json_encode($obj),
         );
-    }
-
-    public function getUrlAttribute(): string {
-        return route("poll.question.get", ['poll'=>$this->poll->id, 'question'=>$this->id]);
     }
 }
