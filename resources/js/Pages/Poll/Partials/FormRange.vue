@@ -13,7 +13,9 @@ const props = defineProps({
     },
 });
 
-const sliderValue = ref(-0.1);
+const sliderValue = computed(()=>
+    model.value!=null ? model.value.input : -0.1
+);
 
 const rangeMax = ref(props.responseParams.max);
 const rangeMin = ref(props.responseParams.min);
@@ -29,7 +31,7 @@ const wrapAnswer = (x) => {
 
 <template>
     <Vue3Slider 
-        :modelValue="notSet ? 0 : sliderValue" @update:modelValue="$val => {sliderValue = $val; model = wrapAnswer($val)}" 
+        :modelValue="notSet ? 0 : sliderValue" @update:modelValue="$val => {model = wrapAnswer($val)}" 
         :min="rangeMin" :max="rangeMax" 
         :circle-gap="80" :circle-offset="220" orientation="circular"
         :alwaysShowHandle="true"

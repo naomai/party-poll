@@ -16,14 +16,15 @@ const props = defineProps({
     },
 });
 
-const responseLocal = ref(props.question.answer);
+
+const responseLocal = ref(props.question.answer!=null ? props.question.answer.response.answer : null);
 
 const form = useForm({
     answer: {},
 });
 
 const submit = () => {
-    form.answer = responseLocal.value.input;
+    form.answer = responseLocal.value;
     form.put(
         route('question.answer.store', props.question.id), {
         onFinish: () => {},
@@ -40,7 +41,6 @@ const submit = () => {
             </div>
             <form @submit.prevent="submit"
                 class="px-6 block" :class="{'hidden': props.answer!=null || !question.revealed}">
-
                 <FormRange v-if="question.type=='range'" :response-params="question.response_params" v-model="responseLocal"/>
                 <FormInput v-if="question.type=='input'" :response-params="question.response_params" v-model="responseLocal"/>
                 <FormSelect v-if="question.type=='select'" :response-params="question.response_params" v-model="responseLocal"/>
