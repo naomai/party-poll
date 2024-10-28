@@ -39,6 +39,13 @@ class PollPolicy {
         return false;
     }
 
+    public function answer(User $user, Poll $poll): bool {
+        return true;
+        $participation = $poll->getUserParticipation($user);
+        $pollStarted = $poll->sequence_id !== null;
+        return $participation->can_answer || $pollStarted;
+    }
+
     public function listQuestions(User $user, Poll $poll): bool {
         return true;
         $participation = $poll->getUserParticipation($user);
