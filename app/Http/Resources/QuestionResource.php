@@ -22,15 +22,25 @@ class QuestionResource extends JsonResource
             ['question_id', '=', $this->id],
         ])->first();
 
+        $answersTotal = null;
+        $answerStats = null;
+
+        if($this->poll->show_question_results) {
+            $answersTotal = $this->answers->count();
+            $answerStats = [];
+        }
+
         return [
             'id' => $this->id,
-            'sequence_id' => $this->poll_sequence_id,
+            //'sequence_id' => $this->poll_sequence_id,
             'question' => $this->question,
             'type' => $this->type,
             'response_params' => $this->response_params,
             'owner' => $owner,
             'answer' => $answer,
             'revealed' => $this->revealed,
+            'answers_total' => $answersTotal,
+            'stats' => $answerStats
         ];
     }
 }
