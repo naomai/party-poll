@@ -22,4 +22,15 @@ class PollParticipant extends Model {
     public function user(): BelongsTo {
         return $this->belongsTo(User::class);
     }
+
+    protected function casts(): array {
+        return [
+            'can_modify_poll' => 'boolean',
+            'can_control_flow' => 'boolean',
+            'can_see_progress' => 'boolean',
+            'can_answer' => 'boolean',
+
+        ];
+    }
+
 }
