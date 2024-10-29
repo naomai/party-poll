@@ -22,6 +22,9 @@ class AnswerController extends Controller {
     ) {
         $svc->storeAnswer($request, $question);
         
+        return to_route("polls.show", [
+            'poll'=>$question->poll->id
+        ], 303); 
     }
 
     /**
