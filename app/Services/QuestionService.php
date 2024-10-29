@@ -43,10 +43,15 @@ class QuestionService {
                 return ['answer.input'=>["required", "numeric", "gte:0.5", "lte:5"]];
             case 'select':
                 $maxSelected = $params->max_selected;
+                $maxAnswerId = count($params->options) - 1;
                 if($maxSelected == 0) {
                     $maxSelected = count($params->options);
                 }
-                return ['answer.selected'=>["required", "array", "gte:1", "lte:{$maxSelected}"]];
+                
+                return [
+                    'answer.selected'=>["required", "array", "between:1,{$maxSelected}"],
+                    'answer.selected.*'=>["required", "integer", "between:0,{$maxAnswerId}"],
+                ];
         }
     }
 }
