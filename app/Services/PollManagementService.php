@@ -30,13 +30,17 @@ class PollManagementService {
     public function show(Poll $poll): Array {
         Gate::authorize('view', $poll);
 
+        PollStateService::refreshState($poll);
+
         $user = Auth::user();
+        $participation = PollStateService::getPollParticipation($poll, $user);
 
         $response = [];
 
         $response['info'] = new PollSummaryResource($poll);
+        $response['state'] = PollStateService::getUserState($participation);
         $response['questions'] = self::getQuestionList($poll);
-        $response['participation'] = PollStateService::getPollParticipation($poll, $user); 
+        $response['participation'] = PollStateService::getAllowedActions($participation); 
 
         return $response;
     }

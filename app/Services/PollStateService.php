@@ -17,19 +17,142 @@ class PollStateService {
         ])->first();
     }
 
+    public static function getAllowedActions(PollParticipant $participation): Array {
+        /** @var Poll */
+        $poll = $participation->poll;
+        $pollStarted = $poll->sequence_id !== null;
+
+        $pollClosed = 
+            ($poll->close_after_start || $poll->wait_for_everybody) 
+            && $pollStarted;
+
+        $actions = [
+            'modify_poll' => $participation->can_modify_poll,
+            'control_flow' => $participation->can_control_flow,
+            'see_progress' => $participation->can_see_progress,
+            'answer' => $participation->can_answer,
+
+            //derived permissions
+
+            'see_all_questions' => (
+                $participation->can_modify_poll ||
+                $participation->can_control_flow ||
+                $participation->can_see_progress
+            ),
+            'invite' => (
+                $poll->enable_link_invite && !$pollClosed
+            )
+
+        ];
+        return $actions;
+    }
+
+    public static function getUserState(PollParticipant $participation): array {
+        $poll = $participation->poll;
+
+        $pollState = static::getPollState($poll);
+
+        return [
+            'waiting_start' => !$pollState['started'],
+            'waiting_others' => $pollState['blocking'],
+            'poll_state' => $pollState,
+        ];
+        
+    }
+
+    public static function getPollState(Poll $poll): array {
+        $pollStarted = $poll->sequence_id !== null;
+
+        $blocking = false;
+        $blockingQuestion = static::getBlockingQuestion($poll);
+
+        if($blockingQuestion!==null) {
+            $peopleCount = $poll->pollParticipants->count();
+            $answersCount = $blockingQuestion->answers->count();
+            $blocking = $answersCount < $peopleCount;
+        }
+
+        $moreQuestions = static::getNextQuestion($poll) !== null;
+        
+
+        return [
+            'started' => $pollStarted,
+            'blocking' => $blocking,
+            'more_questions' => $moreQuestions,
+        ];
+    }
+
+    public static function refreshState(Poll $poll): void {
+        if($poll->wait_for_everybody) {
+            $state = static::getPollState($poll);
+            if($state['started'] && !$state['blocking'] && $state['more_questions']) {
+                static::advanceSequence($poll);
+            }
+        }
+    }
+
+    public static function advanceSequence(Poll $poll): void {
+        if(!$poll->wait_for_everybody) {
+            return;
+        }
+        
+        $next = static::getNextQuestion($poll);
+
+        if($next !== null) {
+            $poll->sequence_id = $next->poll_sequence_id;
+            $poll->save();
+        }
+    }
+
+    public static function getBlockingQuestion(Poll $poll): ?Question {
+        $blockingQuestion = null;
+        $waitForAll = $poll->wait_for_everybody;
+        $pollStarted = $poll->sequence_id !== null;
+
+        if($waitForAll && $pollStarted) {
+            $blockingQuestion = 
+                static::getQuestionSequence($poll)
+                ->where('poll_sequence_id', '<=', $poll->sequence_id)
+                ->get()->last();
+        }
+        return $blockingQuestion;
+    }
+
+    public static function getNextQuestion(Poll $poll): ?Question {
+        $nextQuestion = null;
+        $waitForAll = $poll->wait_for_everybody;
+        $sequenceId = $poll->sequence_id;
+        $sequenceIdPub = $poll->published_sequence_id;
+        if($sequenceId === null) {
+            $sequenceId = 0;
+        }
+
+        if($waitForAll) {
+            $nextQuestion =
+                static::getQuestionSequence($poll)
+                ->where([
+                    ['poll_sequence_id', '>', $sequenceId],
+                    ['poll_sequence_id', '<=', $sequenceIdPub],
+                ])
+                ->get()->first();
+        }
+        return $nextQuestion;
+    }
+    
+
     public static function getCurrentQuestion(PollParticipant $participation): ?Question {
         $question = static::getAccessibleQuestions($participation)->last();
         return $question;
     }
 
-    public static function getPollQuestions(PollParticipant $participation): Builder {
+    public static function getQuestionSequence(Poll $poll): Builder {
 
-        return Question::where('poll_id', "=", $participation->poll->id)
+        return Question::where('poll_id', "=", $poll->id)
             ->orderBy('poll_sequence_id');
     }
 
     public static function getQuestionAnswerPairs(PollParticipant $participation): Collection {
-        $questions = static::getPollQuestions($participation)->get();
+        $questions = static::getQuestionSequence($participation->poll)->get();
         $answers = Answer::where([
             ['user_id', "=", $participation->user->id],
         ])->get();
@@ -53,7 +176,7 @@ class PollStateService {
             return collect([]);
         }
         
-        $questions = static::getPollQuestions($participation)
+        $questions = static::getQuestionSequence($poll)
             ->where(
                 'poll_sequence_id', "<=", $poll->published_sequence_id
             );
