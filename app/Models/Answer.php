@@ -19,10 +19,18 @@ class Answer extends Model {
         return $this->belongsTo(User::class);
     }
 
+    /*
     public function response(): Attribute {
         return Attribute::make(
             get: fn (string $json) => json_decode($json, true),
             set: fn (array $obj) => json_encode($obj),
         );
+    }
+        */
+
+    protected function casts(): array {
+        return [
+            'response' => 'object',
+        ];
     }
 }
