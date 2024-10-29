@@ -19,9 +19,9 @@ const hasQuestions = computed(() =>
     questions.length > 0
 );
 
-const isAdmin = computed(() => participation.can_modify_poll);
+const isAdmin = computed(() => participation.modify_poll);
 const canSeeAllQuestions = computed(() => 
-    participation.can_modify_poll || participation.can_see_progress
+    participation.modify_poll || participation.see_progress
 );
 
 </script>
