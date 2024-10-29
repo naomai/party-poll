@@ -67,4 +67,9 @@ const optionChanged = (id, value) => {
             />
         <label :for="'rdb-'+id+'-'+index" class='pl-3 text-sm text-gray-900'>{{ option.caption }}</label>
     </div>
+    <div v-if="multiSelect && selectedMax != 0"
+        class="text-sm text-gray-500"
+    >
+        Max: {{ selectedMax }}
+    </div>
 </template>
