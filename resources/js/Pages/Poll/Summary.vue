@@ -39,7 +39,7 @@ const canSeeAllQuestions = computed(() =>
         </template>
 
         <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div id="poll-summary" class="mx-auto max-w-7xl sm:px-6 lg:px-8">
 
                 <AllowedActions :participation="participation"/>
                 <div
@@ -57,5 +57,8 @@ const canSeeAllQuestions = computed(() =>
                 </div>
             </div>
         </div>
+    <pre>
+{{ page.props }}
+    </pre>
     </AuthenticatedLayout>
 </template>
