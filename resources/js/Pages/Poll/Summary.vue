@@ -45,11 +45,13 @@ const clientState = reactive({
             </h2>
         </template>
         <div class="py-12">
-            <div id="poll-summary" class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div id="poll-summary" 
+                :class="{editing: clientState.editing}"
+            >
 
                 <AllowedActions :participation="participation" v-model:client-state="clientState" />
                 <div
-                    class="overflow-hidden bg-white shadow-sm sm:rounded-lg flex justify-center gap-6 flex-wrap"
+                    class="poll-questions"
                     :class="{editing: clientState.editing}"
                 >
                     <div v-if="!hasQuestions" class="text-gray-400 text-center px-6 py-6 w-full">
@@ -57,7 +59,7 @@ const clientState = reactive({
                     </div>
                     <ul 
                         v-if="hasQuestions" 
-                        role="list" class="w-full divide-y  divide-gray-100 text-lg"
+                        role="list" class="question-list"
                     >
                         <Question v-if="!clientState.editing"
                             v-for="question in questions" 
@@ -69,11 +71,11 @@ const clientState = reactive({
                             :question="question" :poll-state="page.props.state"
                             :client-state="clientState"
                         />
-                        <div v-if="page.props.state.waiting_others" class="text-gray-400 text-center px-6 py-6 w-full">
+                        <div v-if="page.props.state.waiting_others && !clientState.editing" class="text-gray-400 text-center px-6 py-6 w-full">
                             Waiting for others... ({{ page.props.state.others_responses_left }})
                         </div>
                     </ul>
-                    <div v-if="!hasMoreQuestions" class="text-gray-400 text-center px-6 py-6 w-full">
+                    <div v-if="!hasMoreQuestions && !clientState.editing" class="text-gray-400 text-center px-6 py-6 w-full">
                         No more questions for you. Come back soon!
                     </div>
                     <div v-if="isAdmin && clientState.editing" class="self-center py-6">

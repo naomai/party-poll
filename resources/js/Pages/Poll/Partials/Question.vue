@@ -43,30 +43,39 @@ const submit = () => {
 </script>
 
 <template>
-    <li class="flex justify-between gap-x-6 py-5"  
+    <li 
         v-if="question.revealed"
+        :class="{collapsed: collapsed}"
+        @click="collapsed = !collapsed"
     >
-        <div class="min-w-0 gap-x-4">
-            <div class="pl-6 min-w-0 block">
-                <p class="text-sm font-semibold leading-6 text-gray-900" 
-                    @click="collapsed = !collapsed"
-                >
+        <div class="question">
+            <div class="text-container">
+                <p>
                     {{ question.question }}
                 </p>
+                <svg xmlns="http://www.w3.org/2000/svg" 
+                    viewBox="0 0 24 24" fill="currentColor" 
+                    class="collapse-chevron"
+                >
+                    <path fill-rule="evenodd" d="M12.53 16.28a.75.75 0 0 1-1.06 0l-7.5-7.5a.75.75 0 0 1 1.06-1.06L12 14.69l6.97-6.97a.75.75 0 1 1 1.06 1.06l-7.5 7.5Z" clip-rule="evenodd" />
+                </svg>
+
             </div>
             <TransitionGroup name="collapse">
                 
-                <div v-if="!collapsed">
+                <div v-if="!collapsed"
+                    class="response-editor"
+                    @click.stop=""
+                >
                     <form v-if="question.answer==null && question.revealed"
                         @submit.prevent="submit"
-                        class="px-6 block" >
+                    >
                         <FormRange v-if="question.type=='range'" :response-params="question.response_params" v-model="responseLocal"/>
                         <FormInput v-if="question.type=='input'" :response-params="question.response_params" v-model="responseLocal"/>
                         <FormSelect v-if="question.type=='select'" :response-params="question.response_params" v-model="responseLocal"/>
                         <FormRating v-if="question.type=='rating'" :response-params="question.response_params" v-model="responseLocal"/>
-                        <div class="px-6 block">
+                        <div>
                             <PrimaryButton
-                                class="ms-4"
                                 :class="{ 'opacity-25': responseLocal == null || !responseLocal.valid || form.processing }"
                                 :disabled="responseLocal == null || !responseLocal.valid || form.processing"
                             >
@@ -75,14 +84,16 @@ const submit = () => {
                         </div>
                     </form>
                     <div v-else
-                        class="response_stats"
+                        class="response-stats"
                     >
                         <StatsChart v-if="question.stats.type=='options'" :stats="question.stats" />
                         <StatsText v-if="question.stats.type=='list'" :stats="question.stats" />
 
                     </div>
                 </div>
-                <div v-else-if="responseLocal !== null" class="text-sm text-gray-400 px-6">
+                <div v-else-if="responseLocal !== null" 
+                    class="response-preview"
+                >
                     <span v-if="question.type=='range'">{{ responseLocal.input }}</span>
                     <span v-if="question.type=='text'">{{ responseLocal.input }}</span>
                     <span v-if="question.type=='rating'">{{ responseLocal.input }} / 5</span>
