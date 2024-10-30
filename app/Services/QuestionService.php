@@ -24,7 +24,84 @@ class QuestionService {
             uniqueBy: ['question_id', 'user_id'], 
             update: ['response']
         );
+    }
 
+    public static function getQuestionStats(Question $question): array {
+        $stats = ['options'=>[]];
+        $answers = $question->answers->all();
+
+        switch($question->type) {
+            case "text":
+                $stats['type'] = 'list';
+                $stats['options'] = array_map(
+                    fn($a) => $a->response->input,
+                    $answers,
+                );
+                break;
+            case 'select':
+                $stats['type'] = 'options';
+                $stats['wide'] = false;
+                $options = $question->response_params->options;
+                
+                // create template for options array - [text, votecount]
+                $optionsStatsEmpty = array_map(
+                    fn($o) => [$o->caption, 0], 
+                    $options
+                );
+                
+                // lay selections (checkboxes selected) by all users in one flat array
+                $allSelections = array_reduce(
+                    $answers,
+                    fn($cumulative, $answer) => array_merge($cumulative, $answer->response->selected),
+                    []
+                );
+                
+                // fill options array
+                $stats['options'] = array_reduce(
+                    $allSelections, 
+                    function($stat, $item) {
+                        $stat[$item][1]++;
+                        return $stat;
+                    },
+                    $optionsStatsEmpty
+                );
+                break;
+            case 'rating':
+            case 'range':
+                $stats['type'] = 'options';
+                $stats['wide'] = true;
+
+                if($question->type=='rating') {
+                    // TODO - replace magic values
+                    $min = 0.5;
+                    $max = 5;
+                    $step = 0.5;
+                } else{
+                    $min = $question->response_params->min;
+                    $max = $question->response_params->max;
+                    $step = 1;
+                }
+
+                // create template for options array - [text, votecount]
+                $optionsStatsEmpty = array_fill(0, ceil(($max-$min) / $step + 1), [null, 0]);
+                array_walk($optionsStatsEmpty, function(&$o, $i) use ($min, $step) {
+                    $o[0] = (string)($min + $i * $step);
+                });
+
+                // fill options array
+                $stats['options'] = array_reduce(
+                    $answers, 
+                    function($stat, $answer) {
+                        $item = $answer->response->input;
+                        $stat[$item][1]++;
+                        return $stat;
+                    },
+                    $optionsStatsEmpty
+                );
+                break;
+
+        }
+        return $stats;
     }
 
     private static function getValidatorForQuestion(Question $question): Array {
