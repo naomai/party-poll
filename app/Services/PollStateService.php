@@ -54,12 +54,15 @@ class PollStateService {
         $currentQuestion = static::getCurrentQuestion($participation);
         $currentQuestionId = $currentQuestion!==null ? $currentQuestion->id : null;
 
+        $othersResponsesLeft = $poll->pollParticipants->count() - $currentQuestion->answers->count();
+
         return [
             'waiting_start' => !$pollState['started'],
             'waiting_others' => $pollState['blocking'],
             'more_questions' => $pollState['more_questions'],
-            'current_question' => $currentQuestionId,
-
+            'question_id' => $currentQuestionId,
+            'blocking_id' => $pollState['blocking_id'],
+            'others_responses_left' => $othersResponsesLeft,
             'poll_state' => $pollState,
         ];
         
@@ -83,7 +86,9 @@ class PollStateService {
         return [
             'started' => $pollStarted,
             'blocking' => $blocking,
+            'blocking_id' => $blockingQuestion->id,
             'more_questions' => $moreQuestions,
+            'published_seq' => $poll->published_sequence_id,
         ];
     }
 
@@ -104,6 +109,7 @@ class PollStateService {
         $next = static::getNextQuestion($poll);
 
         if($next !== null) {
+            $poll->timestamps = false;
             $poll->sequence_id = $next->poll_sequence_id;
             $poll->save();
         }
@@ -147,9 +153,9 @@ class PollStateService {
 
     public static function getCurrentQuestion(PollParticipant $participation): ?Question {
         $question = static::getAccessibleQuestions($participation)->last();
-        if($question->answers->where('user_id', '=', $participation->user->id)->count() != 0) {
+        /*if($question->answers->where('user_id', '=', $participation->user->id)->count() != 0) {
             return null;
-        }
+        }*/
         return $question;
     }
 
