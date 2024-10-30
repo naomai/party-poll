@@ -1,0 +1,22 @@
+/* we will explain what these classes do next! */
+.collapse-enter-active,
+.collapse-leave-active {
+    display: grid;
+    transition: all 0.5s ease;
+    & > * {
+        overflow: hidden;
+    }
+}
+
+.collapse-enter-from,
+.collapse-leave-to {
+    
+    grid-template-rows: 0fr;
+    opacity: 0;
+}
+
+.collapse-enter-to,
+.collapse-leave-from {
+    grid-template-rows: 1fr;
+    opacity: 1;
+}

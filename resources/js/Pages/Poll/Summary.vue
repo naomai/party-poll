@@ -6,6 +6,7 @@ import { computed, reactive } from 'vue';
 import PollPropertiesForm from '../PollManagement/PollPropertiesForm.vue';
 import Modal from '@/Components/Modal.vue';
 import { ref } from 'vue';
+import EditQuestion from './Partials/EditQuestion.vue';
 import Question from './Partials/Question.vue';
 import AllowedActions from './Partials/AllowedActions.vue';
 
@@ -26,6 +27,10 @@ const canSeeAllQuestions = computed(() =>
     participation.modify_poll || participation.see_progress
 );
 
+const clientState = reactive({
+    editing: false,
+})
+
 </script>
 
 <template>
@@ -39,26 +44,39 @@ const canSeeAllQuestions = computed(() =>
             {{ info.title }}
             </h2>
         </template>
-
         <div class="py-12">
             <div id="poll-summary" class="mx-auto max-w-7xl sm:px-6 lg:px-8">
 
-                <AllowedActions :participation="participation"/>
+                <AllowedActions :participation="participation" v-model:client-state="clientState" />
                 <div
                     class="overflow-hidden bg-white shadow-sm sm:rounded-lg flex justify-center gap-6 flex-wrap"
+                    :class="{editing: clientState.editing}"
                 >
                     <div v-if="!hasQuestions" class="text-gray-400 text-center px-6 py-6 w-full">
                         {{ isAdmin ? "There are no questions here. Go ahead and add some!" : "We don't have any questions yet. Come back soon!" }}
                     </div>
-                    <ul v-if="hasQuestions" role="list" class="w-full divide-y  divide-gray-100 text-lg">
-                        <Question v-for="question in questions" 
+                    <ul 
+                        v-if="hasQuestions" 
+                        role="list" class="w-full divide-y  divide-gray-100 text-lg"
+                    >
+                        <Question v-if="!clientState.editing"
+                            v-for="question in questions" 
                             :question="question" :poll-state="page.props.state"
+                            :client-state="clientState"
                         />
+                        <EditQuestion v-else
+                            v-for="question in questions" 
+                            :question="question" :poll-state="page.props.state"
+                            :client-state="clientState"
+                        />
+                        <div v-if="page.props.state.waiting_others" class="text-gray-400 text-center px-6 py-6 w-full">
+                            Waiting for others... ({{ page.props.state.others_responses_left }})
+                        </div>
                     </ul>
                     <div v-if="!hasMoreQuestions" class="text-gray-400 text-center px-6 py-6 w-full">
-                        {{ "No more questions for you. Come back soon!" }}
+                        No more questions for you. Come back soon!
                     </div>
-                    <div v-if="isAdmin" class="self-center py-6">
+                    <div v-if="isAdmin && clientState.editing" class="self-center py-6">
                         <ListAddButton class="" @click="inQuestion=true">New question</ListAddButton>
                     </div>
                 </div>

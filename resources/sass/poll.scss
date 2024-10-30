@@ -15,6 +15,10 @@
             opacity: 0.5;
         }
 
+        &.active {
+            background-color: #272;
+        }
+
         svg {
             fill: #fff;
             width: 1.15rem;
