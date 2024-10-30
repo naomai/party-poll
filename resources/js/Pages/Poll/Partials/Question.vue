@@ -37,6 +37,7 @@ const submit = () => {
     form.put(
         route('question.answer.store', props.question.id), {
         onFinish: () => {},
+        preserveScroll: true,
     });
 };
 
