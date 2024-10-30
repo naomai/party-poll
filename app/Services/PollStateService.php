@@ -51,10 +51,15 @@ class PollStateService {
         $poll = $participation->poll;
 
         $pollState = static::getPollState($poll);
+        $currentQuestion = static::getCurrentQuestion($participation);
+        $currentQuestionId = $currentQuestion!==null ? $currentQuestion->id : null;
 
         return [
             'waiting_start' => !$pollState['started'],
             'waiting_others' => $pollState['blocking'],
+            'more_questions' => $pollState['more_questions'],
+            'current_question' => $currentQuestionId,
+
             'poll_state' => $pollState,
         ];
         
@@ -142,6 +147,9 @@ class PollStateService {
 
     public static function getCurrentQuestion(PollParticipant $participation): ?Question {
         $question = static::getAccessibleQuestions($participation)->last();
+        if($question->answers->where('user_id', '=', $participation->user->id)->count() != 0) {
+            return null;
+        }
         return $question;
     }
 
