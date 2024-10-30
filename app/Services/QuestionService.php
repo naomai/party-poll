@@ -17,7 +17,7 @@ class QuestionService {
         $answerRecord = [
             'question_id' => $question->id,
             'user_id' => Auth::user()->id,
-            'response' => json_encode($validated),
+            'response' => json_encode($validated['answer']),
         ];
         Answer::upsert(
             [$answerRecord], 

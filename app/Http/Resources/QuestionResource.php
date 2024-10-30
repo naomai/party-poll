@@ -37,7 +37,7 @@ class QuestionResource extends JsonResource
             'type' => $this->type,
             'response_params' => $this->response_params,
             'owner' => $owner,
-            'answer' => $answer,
+            'answer' => $answer!==null ? $answer->response : null,
             'revealed' => $this->revealed,
             'answers_total' => $answersTotal,
             'stats' => $answerStats

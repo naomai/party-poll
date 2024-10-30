@@ -16,8 +16,8 @@ const props = defineProps({
     },
 });
 
-
-const responseLocal = ref(props.question.answer!=null ? props.question.answer.response.answer : null);
+const responseLocal = ref(props.question.answer!=null ? props.question.answer : null);
+const collapsed = ref(props.question.answer !== null && props.question.id != props.pollState.current_question);
 
 const form = useForm({
     answer: {},
