@@ -16,8 +16,10 @@ const questions = page.props.questions;
 const participation = page.props.participation;
 
 const hasQuestions = computed(() =>
-    questions.length > 0
+    questions.value.length > 0
 );
+
+const hasMoreQuestions = ref(page.props.state.more_questions);
 
 const isAdmin = computed(() => participation.modify_poll);
 const canSeeAllQuestions = computed(() => 
@@ -53,6 +55,9 @@ const canSeeAllQuestions = computed(() =>
                             :question="question" :poll-state="page.props.state"
                         />
                     </ul>
+                    <div v-if="!hasMoreQuestions" class="text-gray-400 text-center px-6 py-6 w-full">
+                        {{ "No more questions for you. Come back soon!" }}
+                    </div>
                     <div v-if="isAdmin" class="self-center py-6">
                         <ListAddButton class="" @click="inQuestion=true">New question</ListAddButton>
                     </div>
