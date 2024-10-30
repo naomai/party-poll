@@ -49,7 +49,9 @@ const canSeeAllQuestions = computed(() =>
                         {{ isAdmin ? "There are no questions here. Go ahead and add some!" : "We don't have any questions yet. Come back soon!" }}
                     </div>
                     <ul v-if="hasQuestions" role="list" class="w-full divide-y  divide-gray-100 text-lg">
-                        <Question v-for="question in questions" :question="question"></Question>
+                        <Question v-for="question in questions" 
+                            :question="question" :poll-state="page.props.state"
+                        />
                     </ul>
                     <div v-if="isAdmin" class="self-center py-6">
                         <ListAddButton class="" @click="inQuestion=true">New question</ListAddButton>

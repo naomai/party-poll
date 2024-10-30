@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use App\Models\Answer;
 use App\Models\User;
+use App\Services\QuestionService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
@@ -27,7 +28,7 @@ class QuestionResource extends JsonResource
 
         if($this->poll->show_question_results) {
             $answersTotal = $this->answers->count();
-            $answerStats = [];
+            $answerStats = QuestionService::getQuestionStats($this->resource);
         }
 
         return [
