@@ -12,7 +12,7 @@ import AllowedActions from './Partials/AllowedActions.vue';
 
 const page = usePage();
 const info = page.props.info;
-const questions = page.props.questions;
+const questions = computed(()=>page.props.questions);
 const participation = page.props.participation;
 
 const hasQuestions = computed(() =>
