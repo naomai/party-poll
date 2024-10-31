@@ -7,6 +7,7 @@ import FormRating from './FormRating.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import { useForm } from '@inertiajs/vue3';
 import StatsChart from './StatsChart.vue';
+import VueCollapse from "vue3-collapse";
 
 const props = defineProps({
     question: {
@@ -62,9 +63,21 @@ const submit = () => {
                 </svg>
 
             </div>
-            <TransitionGroup name="collapse">
-                
-                <div v-if="!collapsed"
+            <VueCollapse duration="250" :model-value="collapsed" easing="var(--timing-bouncy)">
+                <div v-if="responseLocal !== null" 
+                    class="response-preview"
+                >
+                    <span v-if="question.type=='range'">{{ responseLocal.input }}</span>
+                    <span v-if="question.type=='text'">{{ responseLocal.input }}</span>
+                    <span v-if="question.type=='rating'">{{ responseLocal.input }} / 5</span>
+                    <span v-if="question.type=='select'">{{ responseLocal.selected.reduce(
+                        (acc, option) => (acc!="" ? acc+", " : "") + question.response_params.options[option].caption,
+                        ""
+                    ) }}</span>
+                </div>
+            </VueCollapse>
+            <VueCollapse duration="350" :model-value="!collapsed" easing="var(--timing-bouncy)">
+                <div
                     class="response-editor"
                     @click.stop=""
                 >
@@ -92,18 +105,7 @@ const submit = () => {
 
                     </div>
                 </div>
-                <div v-else-if="responseLocal !== null" 
-                    class="response-preview"
-                >
-                    <span v-if="question.type=='range'">{{ responseLocal.input }}</span>
-                    <span v-if="question.type=='text'">{{ responseLocal.input }}</span>
-                    <span v-if="question.type=='rating'">{{ responseLocal.input }} / 5</span>
-                    <span v-if="question.type=='select'">{{ responseLocal.selected.reduce(
-                        (acc, option) => (acc!="" ? acc+", " : "") + question.response_params.options[option].caption,
-                        ""
-                    ) }}</span>
-                </div>
-            </TransitionGroup>
+            </VueCollapse>
         </div>
     </li>
 </template>

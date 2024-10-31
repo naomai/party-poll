@@ -5,9 +5,10 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createApp, h } from 'vue';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
-import Vue3Slider from 'vue3-slider';
+import VueSlider from 'vue3-slider';
 import VueStarRating from 'vue-star-rating'
 import VueApexCharts from "vue3-apexcharts";
+import VueCollapse from "vue3-collapse";
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -27,5 +28,5 @@ createInertiaApp({
     progress: {
         color: '#4B5563',
     },
-    components: { Vue3Slider, VueStarRating, VueApexCharts }
+    components: { VueSlider, VueStarRating, VueApexCharts, VueCollapse }
 });
