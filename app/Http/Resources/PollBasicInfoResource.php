@@ -18,7 +18,7 @@ class PollBasicInfoResource extends JsonResource
             'owner' => new UserSummaryResource($this->owner),
             'title' => $this->title,
             'question_count' => $this->questions->count(),
-            'participant_count' => $this->pollParticipants->count(),
+            'member_count' => $this->memberships->count(),
             'links' => [
                 'summary' => $this->getUrlSummaryAttribute(),
             ]

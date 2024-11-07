@@ -26,7 +26,7 @@ class Poll extends Model {
     public static function booted(): void {
         self::created(function(Poll $poll){
             Model::unguard();
-            PollParticipant::create([
+            Membership::create([
                 'poll_id' => $poll->id,
                 'user_id' => $poll->owner_id,
                 'can_modify_poll' =>    1,
@@ -45,13 +45,13 @@ class Poll extends Model {
         return $this->belongsTo(User::class);
     }
 
-    public function pollParticipants(): HasMany {
-        return $this->hasMany(PollParticipant::class);
+    public function memberships(): HasMany {
+        return $this->hasMany(Membership::class);
     }
 
     public function users(): HasManyThrough {
         return $this->hasManyThrough(
-            User::class, PollParticipant::class, 
+            User::class, Membership::class, 
             'poll_id', 'id',
             'id', 'user_id'
         );
@@ -59,16 +59,16 @@ class Poll extends Model {
 
     // ------
 
-    public function getUserParticipation(User $user): ?PollParticipant {
-        $participation = $this->pollParticipants
+    public function getMembership(User $user): ?Membership {
+        $membership = $this->memberships
             ->where('user_id', '=', $user->id)
             ->first();
-        return $participation;
+        return $membership;
     }
 
-    public function hasParticipant(User $user): bool {
-        $participation = $this->getUserParticipation($user);
-        return $participation !== null;
+    public function hasMember(User $user): bool {
+        $membership = $this->getMembership($user);
+        return $membership !== null;
     }
 
 }

@@ -3,23 +3,23 @@ namespace App\Services;
 
 use App\Models\Answer;
 use App\Models\Poll;
-use App\Models\PollParticipant;
+use App\Models\Membership;
 use App\Models\Question;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 class PollStateService {
-    public static function getPollParticipation(Poll $poll, User $user): PollParticipant {
-        return PollParticipant::where([
+    public static function getMembership(Poll $poll, User $user): Membership {
+        return Membership::where([
             ['poll_id', '=', $poll->id],
             ['user_id', '=', $user->id],
         ])->first();
     }
 
-    public static function getAllowedActions(PollParticipant $participation): Array {
+    public static function getAllowedActions(Membership $membership): Array {
         /** @var Poll */
-        $poll = $participation->poll;
+        $poll = $membership->poll;
         $pollStarted = $poll->sequence_id !== null;
 
         $pollClosed = 
@@ -27,17 +27,17 @@ class PollStateService {
             && $pollStarted;
 
         $actions = [
-            'modify_poll' => $participation->can_modify_poll,
-            'control_flow' => $participation->can_control_flow,
-            'see_progress' => $participation->can_see_progress,
-            'answer' => $participation->can_answer,
+            'modify_poll' => $membership->can_modify_poll,
+            'control_flow' => $membership->can_control_flow,
+            'see_progress' => $membership->can_see_progress,
+            'answer' => $membership->can_answer,
 
             //derived permissions
 
             'see_all_questions' => (
-                $participation->can_modify_poll ||
-                $participation->can_control_flow ||
-                $participation->can_see_progress
+                $membership->can_modify_poll ||
+                $membership->can_control_flow ||
+                $membership->can_see_progress
             ),
             'invite' => (
                 $poll->enable_link_invite && !$pollClosed
@@ -47,17 +47,18 @@ class PollStateService {
         return $actions;
     }
 
-    public static function getUserState(PollParticipant $participation): array {
-        $poll = $participation->poll;
+    public static function getUserState(Membership $membership): array {
+        $poll = $membership->poll;
 
         $pollState = static::getPollState($poll);
-        $currentQuestion = static::getCurrentQuestion($participation);
+        $currentQuestion = static::getCurrentQuestion($membership);
         $currentQuestionId = $currentQuestion!==null ? $currentQuestion->id : null;
 
-        $othersResponsesLeft = $poll->pollParticipants->count() - $currentQuestion->answers->count();
+        $othersResponsesLeft = $poll->memberships->count() - $currentQuestion->answers->count();
 
         return [
             'waiting_start' => !$pollState['started'],
+            'waiting_me' => $currentQuestionId !== null,
             'waiting_others' => $pollState['blocking'],
             'more_questions' => $pollState['more_questions'],
             'question_id' => $currentQuestionId,
@@ -75,7 +76,7 @@ class PollStateService {
         $blockingQuestion = static::getBlockingQuestion($poll);
 
         if($blockingQuestion!==null) {
-            $peopleCount = $poll->pollParticipants->count();
+            $peopleCount = $poll->memberships->count();
             $answersCount = $blockingQuestion->answers->count();
             $blocking = $answersCount < $peopleCount;
         }
@@ -151,9 +152,9 @@ class PollStateService {
     }
     
 
-    public static function getCurrentQuestion(PollParticipant $participation): ?Question {
-        $question = static::getAccessibleQuestions($participation)->last();
-        /*if($question->answers->where('user_id', '=', $participation->user->id)->count() != 0) {
+    public static function getCurrentQuestion(Membership $membership): ?Question {
+        $question = static::getAccessibleQuestions($membership)->last();
+        /*if($question->answers->where('user_id', '=', $membership->user->id)->count() != 0) {
             return null;
         }*/
         return $question;
@@ -165,10 +166,10 @@ class PollStateService {
             ->orderBy('poll_sequence_id');
     }
 
-    public static function getQuestionAnswerPairs(PollParticipant $participation): Collection {
-        $questions = static::getQuestionSequence($participation->poll)->get();
+    public static function getQuestionAnswerPairs(Membership $membership): Collection {
+        $questions = static::getQuestionSequence($membership->poll)->get();
         $answers = Answer::where([
-            ['user_id', "=", $participation->user->id],
+            ['user_id', "=", $membership->user->id],
         ])->get();
 
         return $questions->map(
@@ -180,9 +181,9 @@ class PollStateService {
 
     }
 
-    public static function getAccessibleQuestions(PollParticipant $participation): ?Collection {
+    public static function getAccessibleQuestions(Membership $membership): ?Collection {
         /** @var Poll */
-        $poll = $participation->poll;
+        $poll = $membership->poll;
         $isStarted = $poll->published_sequence_id !== null;
         $isWaitForAll = $poll->wait_for_everybody;
 
@@ -198,7 +199,7 @@ class PollStateService {
         if($isWaitForAll) {
             $sequenceId = $poll->sequence_id;
         } else {
-            $questionStates = static::getQuestionAnswerPairs($participation);
+            $questionStates = static::getQuestionAnswerPairs($membership);
 
             $firstWithoutAnswer = $questionStates->first(
                 fn($state) => $state['answer']==null

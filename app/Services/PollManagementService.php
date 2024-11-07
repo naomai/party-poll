@@ -33,14 +33,14 @@ class PollManagementService {
         PollStateService::refreshState($poll);
 
         $user = Auth::user();
-        $participation = PollStateService::getPollParticipation($poll, $user);
+        $membership = PollStateService::getMembership($poll, $user);
 
         $response = [];
 
         $response['info'] = new PollSummaryResource($poll);
-        $response['state'] = PollStateService::getUserState($participation);
+        $response['state'] = PollStateService::getUserState($membership);
         $response['questions'] = self::getQuestionList($poll);
-        $response['participation'] = PollStateService::getAllowedActions($participation); 
+        $response['membership'] = PollStateService::getAllowedActions($membership); 
 
         return $response;
     }
@@ -58,12 +58,12 @@ class PollManagementService {
 
     private static function getQuestionList(Poll $poll) {
         $user = Auth::user();
-        $participation = PollStateService::getPollParticipation($poll, $user);
+        $membership = PollStateService::getMembership($poll, $user);
         
         $canSeeAll = 
-            $participation->can_control_flow ||
-            $participation->can_see_progress ||
-            $participation->can_modify_poll;
+            $membership->can_control_flow ||
+            $membership->can_see_progress ||
+            $membership->can_modify_poll;
 
         if($canSeeAll) {
             $lastSeqId = $poll->sequence_id;
@@ -73,7 +73,7 @@ class PollManagementService {
             });
             
         }else{
-            $questions = PollStateService::getAccessibleQuestions($participation);
+            $questions = PollStateService::getAccessibleQuestions($membership);
             $questions = $questions->map(function($q) { 
                 $q->revealed = true;
                 return $q;

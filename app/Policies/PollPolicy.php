@@ -14,7 +14,7 @@ class PollPolicy {
     }
     
     public function view(User $user, Poll $poll): bool {
-        return $poll->hasParticipant($user);
+        return $poll->hasMember($user);
     }
     
     public function store(User $user): bool {
@@ -22,13 +22,13 @@ class PollPolicy {
     }
     
     public function update(User $user, Poll $poll): bool {
-        $participation = $poll->getUserParticipation($user);
-        return $participation->can_modify_poll;
+        $membership = $poll->getMembership($user);
+        return $membership->can_modify_poll;
     }
     
     public function delete(User $user, Poll $poll): bool {
-        $participation = $poll->getUserParticipation($user);
-        return $participation->can_modify_poll;
+        $membership = $poll->getMembership($user);
+        return $membership->can_modify_poll;
     }
     
     public function restore(User $user, Poll $poll): bool {
@@ -41,29 +41,29 @@ class PollPolicy {
 
     public function answer(User $user, Poll $poll): bool {
         return true;
-        $participation = $poll->getUserParticipation($user);
+        $membership = $poll->getMembership($user);
         $pollStarted = $poll->sequence_id !== null;
-        return $participation->can_answer || $pollStarted;
+        return $membership->can_answer || $pollStarted;
     }
 
     public function listQuestions(User $user, Poll $poll): bool {
         return true;
-        $participation = $poll->getUserParticipation($user);
+        $membership = $poll->getMembership($user);
         $canSeeAll = 
-            $participation->can_control_flow ||
-            $participation->can_see_progress ||
-            $participation->can_modify_poll;
+            $membership->can_control_flow ||
+            $membership->can_see_progress ||
+            $membership->can_modify_poll;
         $pollStarted = $poll->sequence_id !== null;
         return $canSeeAll || $pollStarted;
     }
 
     public function controlFlow(User $user, Poll $poll): bool {
-        $participation = $poll->getUserParticipation($user);
-        return $participation->can_control_flow;
+        $membership = $poll->getMembership($user);
+        return $membership->can_control_flow;
     }
 
     public function seeProgress(User $user, Poll $poll): bool {
-        $participation = $poll->getUserParticipation($user);
-        return $participation->can_see_progress;
+        $membership = $poll->getMembership($user);
+        return $membership->can_see_progress;
     }
 }

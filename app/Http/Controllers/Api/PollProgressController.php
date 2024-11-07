@@ -16,11 +16,11 @@ class PollProgressController extends Controller {
     public function view(Poll $poll, PollStateService $service): JsonResponse {
         $user = Auth::user();
         
-        $participation = $service->getPollParticipation($poll, $user);
-        $currentQuestion = $service->getCurrentQuestion($participation);
+        $membership = $service->getMembership($poll, $user);
+        $currentQuestion = $service->getCurrentQuestion($membership);
 
         $state = [
-            "participation"    => $participation,
+            "membership"    => $membership,
             "current_question" => $currentQuestion,
         ];
 

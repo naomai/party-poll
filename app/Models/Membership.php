@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class PollParticipant extends Model {
+class Membership extends Model {
     use HasFactory;
 
     protected $hidden = [

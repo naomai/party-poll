@@ -14,7 +14,7 @@ import AllowedActions from './Partials/AllowedActions.vue';
 const page = usePage();
 const info = page.props.info;
 const questions = computed(()=>page.props.questions);
-const participation = page.props.participation;
+const membership = page.props.membership;
 
 const hasQuestions = computed(() =>
     questions.value.length > 0
@@ -22,9 +22,9 @@ const hasQuestions = computed(() =>
 
 const hasMoreQuestions = ref(page.props.state.more_questions);
 
-const isAdmin = computed(() => participation.modify_poll);
+const isAdmin = computed(() => membership.modify_poll);
 const canSeeAllQuestions = computed(() => 
-    participation.modify_poll || participation.see_progress
+    membership.modify_poll || membership.see_progress
 );
 
 const clientState = reactive({
@@ -49,7 +49,7 @@ const clientState = reactive({
                 :class="{editing: clientState.editing}"
             >
 
-                <AllowedActions :participation="participation" v-model:client-state="clientState" />
+                <AllowedActions :membership="membership" v-model:client-state="clientState" />
                 <div
                     class="poll-questions"
                     :class="{editing: clientState.editing}"
@@ -71,7 +71,7 @@ const clientState = reactive({
                             :question="question" :poll-state="page.props.state"
                             :client-state="clientState"
                         />
-                        <div v-if="page.props.state.waiting_others && !clientState.editing" class="text-gray-400 text-center px-6 py-6 w-full">
+                        <div v-if="hasMoreQuestions && page.props.state.waiting_others && !clientState.editing" class="text-gray-400 text-center px-6 py-6 w-full">
                             Waiting for others... ({{ page.props.state.others_responses_left }})
                         </div>
                     </ul>

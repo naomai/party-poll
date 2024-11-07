@@ -14,18 +14,18 @@ class QuestionPolicy {
     }
 
     public function create(User $user, Poll $poll): bool {
-        $participation = $poll->getUserParticipation($user);
-        return $participation->can_modify_poll;
+        $membership = $poll->getMembership($user);
+        return $membership->can_modify_poll;
     }
 
     public function update(User $user, Question $question): bool {
-        $participation = $question->poll->getUserParticipation($user);
-        return $participation->can_modify_poll;
+        $membership = $question->poll->getMembership($user);
+        return $membership->can_modify_poll;
     }
 
     public function delete(User $user, Question $question): bool {
-        $participation = $question->poll->getUserParticipation($user);
-        return $participation->can_modify_poll;
+        $membership = $question->poll->getMembership($user);
+        return $membership->can_modify_poll;
     }
 
     public function restore(User $user, Question $question): bool {
