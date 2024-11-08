@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 class QuestionPolicy {
     public function view(User $user, Question $question): bool {
-        return $question->poll->hasParticipant($user);
+        return $question->poll->hasMember($user);
     }
 
     public function create(User $user, Poll $poll): bool {

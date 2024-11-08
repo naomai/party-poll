@@ -17,17 +17,17 @@ class QuestionManagementController extends Controller {
     public function index(Poll $poll, PollStateService $service): JsonResponse {
         //$this->authorize('index', Question::class);
         $user = Auth::user();
-        $participation = $service->getPollParticipation($poll, $user);
+        $membership = $service->getMembership($poll, $user);
 
         $canSeeAll = 
-            $participation->can_control_flow ||
-            $participation->can_see_progress ||
-            $participation->can_modify_poll;
+            $membership->can_control_flow ||
+            $membership->can_see_progress ||
+            $membership->can_modify_poll;
 
         if($canSeeAll) {
             $questions = $poll->questions->toArray();
         }else{
-            $questions = $service->getAccessibleQuestions($participation)->toArray();
+            $questions = $service->getAccessibleQuestions($membership)->toArray();
         }
         return response()->json($questions);
     }
