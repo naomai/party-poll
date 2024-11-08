@@ -109,7 +109,7 @@ class QuestionService {
        
         $params = $question->response_params;
         switch($question->type) {
-            case 'text':
+            case 'input':
                 $maxLen = (int)$params->max_length;
                 return ['answer.input'=>["required", "max:{$maxLen}"]];
             case 'range':
