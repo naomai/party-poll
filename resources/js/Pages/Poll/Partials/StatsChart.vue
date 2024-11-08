@@ -1,6 +1,6 @@
 <script setup>
 
-import { reactive } from "vue";
+import { computed, reactive } from "vue";
 import VueApexCharts from "vue3-apexcharts";
 
 const props = defineProps({
@@ -35,8 +35,7 @@ const options = reactive({
   }
 });
 
-const series = reactive([{
-  name: 'series-1',
+const series = computed(()=>[{
   data: props.stats.options.map(
     (d) => ({x: d[0], y: d[1]})
   )
