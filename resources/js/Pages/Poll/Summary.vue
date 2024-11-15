@@ -71,11 +71,11 @@ const clientState = reactive({
                             :question="question" :poll-state="page.props.state"
                             :client-state="clientState"
                         />
-                        <div v-if="hasMoreQuestions && page.props.state.waiting_others && !clientState.editing" class="text-gray-400 text-center px-6 py-6 w-full">
+                        <div v-if="hasMoreQuestions && !page.props.state.waiting_me && page.props.state.waiting_others && !clientState.editing" class="text-gray-400 text-center px-6 py-6 w-full">
                             Waiting for others... ({{ page.props.state.others_responses_left }})
                         </div>
                     </ul>
-                    <div v-if="!hasMoreQuestions && !clientState.editing" class="text-gray-400 text-center px-6 py-6 w-full">
+                    <div v-if="!hasMoreQuestions && !page.props.state.waiting_me && !clientState.editing" class="text-gray-400 text-center px-6 py-6 w-full">
                         No more questions for you. Come back soon!
                     </div>
                     <div v-if="isAdmin && clientState.editing" class="self-center py-6">
