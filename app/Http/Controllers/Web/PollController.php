@@ -12,7 +12,7 @@ use Illuminate\Http\Response;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 
-class PollManagementController extends Controller {
+class PollController extends Controller {
     public function index(PollManagementService $manage): InertiaResponse {
         $pollList = $manage->index();
         return Inertia::render("PollIndex/Index", [

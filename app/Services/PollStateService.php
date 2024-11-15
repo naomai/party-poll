@@ -10,44 +10,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 class PollStateService {
-    public static function getMembership(Poll $poll, User $user): Membership {
-        return Membership::where([
-            ['poll_id', '=', $poll->id],
-            ['user_id', '=', $user->id],
-        ])->first();
-    }
 
-    public static function getAllowedActions(Membership $membership): Array {
-        /** @var Poll */
-        $poll = $membership->poll;
-        $pollStarted = $poll->sequence_id !== null;
-
-        $pollClosed = 
-            ($poll->close_after_start || $poll->wait_for_everybody) 
-            && $pollStarted;
-
-        $actions = [
-            'modify_poll' => $membership->can_modify_poll,
-            'control_flow' => $membership->can_control_flow,
-            'see_progress' => $membership->can_see_progress,
-            'answer' => $membership->can_answer,
-
-            //derived permissions
-
-            'see_all_questions' => (
-                $membership->can_modify_poll ||
-                $membership->can_control_flow ||
-                $membership->can_see_progress
-            ),
-            'invite' => (
-                $poll->enable_link_invite && !$pollClosed
-            )
-
-        ];
-        return $actions;
-    }
-
-    public static function getUserState(Membership $membership): array {
+    /** getMemberState
+     * Get member-specific state of a poll flow
+     */
+    public static function getMemberState(Membership $membership): array {
         $poll = $membership->poll;
 
         $pollState = static::getPollState($poll);
@@ -66,9 +33,11 @@ class PollStateService {
             'others_responses_left' => $othersResponsesLeft,
             'poll_state' => $pollState,
         ];
-        
     }
 
+    /** getPollState
+     * Get global state of a poll flow
+     */
     public static function getPollState(Poll $poll): array {
         $pollStarted = $poll->sequence_id !== null;
 
@@ -93,16 +62,23 @@ class PollStateService {
         ];
     }
 
-    public static function refreshState(Poll $poll): void {
+    /** ensureStateValidity
+     * Validate poll state, and perform recovery when invalid.
+     */
+    public static function ensureStateValidity(Poll $poll): void {
         if($poll->wait_for_everybody) {
             $state = static::getPollState($poll);
             if($state['started'] && !$state['blocking'] && $state['more_questions']) {
-                static::advanceSequence($poll);
+                static::advanceSynchronousPoll($poll);
             }
         }
     }
 
-    public static function advanceSequence(Poll $poll): void {
+    /** advanceSynchronousPoll
+     * Advances synchronous poll to next question. Does nothing if 
+     * poll is asynchronous, or if already reached last published question.
+     */
+    public static function advanceSynchronousPoll(Poll $poll): void {
         if(!$poll->wait_for_everybody) {
             return;
         }
@@ -116,6 +92,9 @@ class PollStateService {
         }
     }
 
+    /** getBlockingQuestion
+     * Get question that's blocking synchronous poll from advancing.
+     */
     public static function getBlockingQuestion(Poll $poll): ?Question {
         $blockingQuestion = null;
         $waitForAll = $poll->wait_for_everybody;
@@ -130,6 +109,13 @@ class PollStateService {
         return $blockingQuestion;
     }
 
+    /** getNextQuestion
+     * Get next question to be presented to member, limited to
+     * published questions.
+     * 
+     * @return ?Question next question in sequence, or null if already reached
+     *   last published question
+     */
     public static function getNextQuestion(Poll $poll): ?Question {
         $nextQuestion = null;
         $waitForAll = $poll->wait_for_everybody;
@@ -152,6 +138,11 @@ class PollStateService {
     }
     
 
+    /** getCurrentQuestion
+     * Get unanswered/blocking question for the member
+     * This question is either waiting for response from member, or blocking 
+     * while waiting for others.
+     */
     public static function getCurrentQuestion(Membership $membership): ?Question {
         $question = static::getAccessibleQuestions($membership)->last();
         /*if($question->answers->where('user_id', '=', $membership->user->id)->count() != 0) {
@@ -160,13 +151,20 @@ class PollStateService {
         return $question;
     }
 
+    /** getQuestionSequence
+     * Get query builder for all poll questions, ordered by poll-sequence
+     */
     public static function getQuestionSequence(Poll $poll): Builder {
 
         return Question::where('poll_id', "=", $poll->id)
             ->orderBy('poll_sequence_id');
     }
 
-    public static function getQuestionAnswerPairs(Membership $membership): Collection {
+    /** getQuestionAnswerPairsSequence
+     * Gets collection of all poll questions paired with member answers.
+     * The pairs are ordered (by poll-sequence)
+     */
+    public static function getQuestionAnswerPairsSequence(Membership $membership): Collection {
         $questions = static::getQuestionSequence($membership->poll)->get();
         $answers = Answer::where([
             ['user_id', "=", $membership->user->id],
@@ -181,6 +179,12 @@ class PollStateService {
 
     }
 
+    /** getAccessibleQuestions
+     * Gets collection of all questions currently accesible to a member
+     * Depending on poll type, fetch questions up to:
+     * - Synchronous: blocking question that's waiting for answers from others
+     * - Asynchronous: first unanswered by the member
+     */
     public static function getAccessibleQuestions(Membership $membership): ?Collection {
         /** @var Poll */
         $poll = $membership->poll;
@@ -199,7 +203,7 @@ class PollStateService {
         if($isWaitForAll) {
             $sequenceId = $poll->sequence_id;
         } else {
-            $questionStates = static::getQuestionAnswerPairs($membership);
+            $questionStates = static::getQuestionAnswerPairsSequence($membership);
 
             $firstWithoutAnswer = $questionStates->first(
                 fn($state) => $state['answer']==null

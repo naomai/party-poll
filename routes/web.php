@@ -3,7 +3,7 @@
 use App\Http\Controllers\Web\AnswerController;
 use App\Http\Controllers\Auth\GuestAccountController;
 use App\Http\Controllers\Web\OnboardingController;
-use App\Http\Controllers\Web\PollManagementController;
+use App\Http\Controllers\Web\PollController;
 use App\Http\Controllers\Web\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,7 +14,7 @@ Route::put("/guest_upgrade", [GuestAccountController::class, 'store'])
     ->name("guest_upgrade");
 
 Route::middleware(['auth:sanctum'])->group(function(){
-    Route::resource('/polls', PollManagementController::class);
+    Route::resource('/polls', PollController::class);
     Route::put('/questions/{question}/answer', [AnswerController::class, "store"])
         ->name('question.answer.store');
 });

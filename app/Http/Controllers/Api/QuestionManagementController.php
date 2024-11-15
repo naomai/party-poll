@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Poll;
 use App\Models\Question;
+use App\Services\MembershipService;
 use App\Services\PollStateService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
@@ -17,7 +18,7 @@ class QuestionManagementController extends Controller {
     public function index(Poll $poll, PollStateService $service): JsonResponse {
         //$this->authorize('index', Question::class);
         $user = Auth::user();
-        $membership = $service->getMembership($poll, $user);
+        $membership = MembershipService::getMembership($poll, $user);
 
         $canSeeAll = 
             $membership->can_control_flow ||

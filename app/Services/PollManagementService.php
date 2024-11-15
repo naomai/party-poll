@@ -30,17 +30,17 @@ class PollManagementService {
     public function show(Poll $poll): Array {
         Gate::authorize('view', $poll);
 
-        PollStateService::refreshState($poll);
+        PollStateService::ensureStateValidity($poll);
 
         $user = Auth::user();
-        $membership = PollStateService::getMembership($poll, $user);
+        $membership = MembershipService::getMembership($poll, $user);
 
         $response = [];
 
         $response['info'] = new PollSummaryResource($poll);
-        $response['state'] = PollStateService::getUserState($membership);
+        $response['state'] = PollStateService::getMemberState($membership);
         $response['questions'] = self::getQuestionList($poll);
-        $response['membership'] = PollStateService::getAllowedActions($membership); 
+        $response['membership'] = MembershipService::getAllowedActions($membership); 
 
         return $response;
     }
@@ -58,7 +58,7 @@ class PollManagementService {
 
     private static function getQuestionList(Poll $poll) {
         $user = Auth::user();
-        $membership = PollStateService::getMembership($poll, $user);
+        $membership = MembershipService::getMembership($poll, $user);
         
         $canSeeAll = 
             $membership->can_control_flow ||
