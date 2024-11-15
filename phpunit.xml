@@ -10,9 +10,10 @@
         </testsuite>
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
+            <exclude>tests/Feature/Auth</exclude>
         </testsuite>
         <testsuite name="Authz">
-            <directory>tests/Feature/Authz</directory>
+            <directory>tests/Authz</directory>
         </testsuite>
     </testsuites>
     <source>

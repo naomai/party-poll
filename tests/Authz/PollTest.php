@@ -10,6 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
+use Inertia\Testing\AssertableInertia as Assert;
 
 class PollTest extends TestCase {
     use RefreshDatabase;
@@ -22,7 +23,7 @@ class PollTest extends TestCase {
         
     }
 
-    public function test_list_poll(): void {
+    public function test_list_poll_restriction(): void {
         $poll = Poll::all()->random();
         $user = $this->getPollMuggle($poll);
 
@@ -31,15 +32,10 @@ class PollTest extends TestCase {
         $this->actingAs($user)
             ->getJson(route('polls.index'))
             ->assertStatus(200)
-            ->assertJsonCount($pollCount)
-            ->assertJsonStructure([
-                '*' => [
-                    'id',
-                    'title',
-                    'owner' => ['id', 'name'],
-                    'links' => ['summary'],
-                ],
-            ]);
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('PollIndex/Index')
+                ->has('polls', $pollCount)
+            );
     }
 
     public function test_access_poll_info_muggle(): void {
