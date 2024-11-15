@@ -46,7 +46,7 @@ class PollManagementService {
     }
 
     public function update(Poll $poll, Array $pollData): JsonResource {
-        Gate::authorize('update', Poll::class);
+        Gate::authorize('update', $poll);
 
         $poll->update($pollData);
         return new PollSummaryResource($poll);

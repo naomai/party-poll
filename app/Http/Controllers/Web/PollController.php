@@ -45,10 +45,10 @@ class PollController extends Controller {
         Poll $poll, 
         PollInfoUpdateRequest $request, 
         PollManagementService $manage
-    ): JsonResponse {
+    ): Response  {
         
         $pollSummary = $manage->update($poll, $request->validated());
-        return response()->json($pollSummary);
+        return response()->noContent();
     }
     
 }

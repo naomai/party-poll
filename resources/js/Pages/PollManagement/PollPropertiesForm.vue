@@ -33,7 +33,7 @@ const submitPollProperties = () => {
         });
     } else {
         form.patch(route('polls.update'), {
-            onFinish: () => form.reset('title'),
+            onFinish: () => {} ,
         });
     }
 }

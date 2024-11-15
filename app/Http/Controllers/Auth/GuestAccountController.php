@@ -15,7 +15,7 @@ class GuestAccountController extends Controller {
 
         $account = Auth::user();
         if($account !== null) {
-            return response()->json($account, 200);
+            return redirect(route("polls.index"), 303);
         }
 
         if(!isset($guestInfo['name'])) {
@@ -39,10 +39,10 @@ class GuestAccountController extends Controller {
                     'poll'=>$pollId,
                     'token'=>$invitationToken,
                 ]
-            ));
+            ), 303);
         }
 
-        return redirect(route("polls.index"));
+        return redirect(route("polls.index"), 303);
     }
 
     private static function generateRandomName(): string {
