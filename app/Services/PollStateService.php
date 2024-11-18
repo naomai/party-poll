@@ -19,9 +19,14 @@ class PollStateService {
 
         $pollState = static::getPollState($poll);
         $currentQuestion = static::getCurrentQuestion($membership);
-        $currentQuestionId = $currentQuestion!==null ? $currentQuestion->id : null;
 
-        $othersResponsesLeft = $poll->memberships->count() - $currentQuestion->answers->count();
+        $currentQuestionId = null;
+        $othersResponsesLeft = 0;
+        
+        if($currentQuestion!==null) {
+            $currentQuestionId = $currentQuestion->id;
+            $othersResponsesLeft = $poll->memberships->count() - $currentQuestion->answers->count();
+        }
 
         return [
             'waiting_start' => !$pollState['started'],
@@ -56,7 +61,7 @@ class PollStateService {
         return [
             'started' => $pollStarted,
             'blocking' => $blocking,
-            'blocking_id' => $blockingQuestion->id,
+            'blocking_id' => $blocking ? $blockingQuestion->id : null,
             'more_questions' => $moreQuestions,
             'published_seq' => $poll->published_sequence_id,
         ];
