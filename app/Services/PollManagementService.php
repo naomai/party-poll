@@ -24,6 +24,9 @@ class PollManagementService {
         $poll = Poll::make($pollData);
         $poll->owner_id = Auth::user()->id;
         $poll->save();
+
+        $this->regenerateInvitationToken($poll);
+        
         return new PollSummaryResource($poll);
     }
 
@@ -54,6 +57,16 @@ class PollManagementService {
 
     public function destroy(string $id) {
         //
+    }
+
+    public function regenerateInvitationToken(Poll $poll) : string {
+        // faker uses mt_rand internally, which is not cryptographically safe
+        $randomWords = fake()->words(3, false);
+        $tokenNew = "lorem-ipsum-" . implode("-", $randomWords);
+
+        $poll->access_link_token = $tokenNew;
+        $poll->save();
+        return $tokenNew;
     }
 
     private static function getQuestionList(Poll $poll) {
