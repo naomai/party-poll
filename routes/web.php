@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Web\AnswerController;
 use App\Http\Controllers\Auth\GuestAccountController;
+use App\Http\Controllers\Web\InvitationController;
 use App\Http\Controllers\Web\OnboardingController;
 use App\Http\Controllers\Web\PollController;
 use App\Http\Controllers\Web\ProfileController;
@@ -25,5 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::get('/invite/{poll}', [InvitationController::class, 'view'])->name('invite.view');
 
 require __DIR__.'/auth.php';

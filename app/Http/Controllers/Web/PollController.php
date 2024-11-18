@@ -28,7 +28,7 @@ class PollController extends Controller {
         $pollSummary = $manage->store($request->validated());
        
         return to_route("polls.show", [
-            'poll'=>$pollSummary->id
+            'poll' => $pollSummary->id
         ], 303);
     }
     

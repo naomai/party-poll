@@ -6,6 +6,26 @@ use App\Models\Poll;
 use App\Models\User;
 
 class MembershipService {
+    public function create(
+        Poll $poll, 
+        User $user, 
+        array $blueprint = self::BLUEPRINT_USER
+    ) : Membership {
+        $membership = $poll->memberships()->where(
+            'user_id', '=', $user->id
+        )->first();
+        if($membership !== null) {
+            return $membership;
+        }
+        $memberProps = $blueprint;
+
+        $memberProps['poll_id'] = $poll->id;
+        $memberProps['user_id'] = $user->id;
+
+        $membership = Membership::make($memberProps);
+        $membership->save();
+        return $membership;
+    }
     
     /** getMembership
      * Get membership object tying User to a Poll
@@ -50,5 +70,27 @@ class MembershipService {
         return $actions;
     }
 
+    public function checkInvitation(Poll $poll, ?string $token) : bool {
+        $tokenMatch = $token !== null && $token == $poll->access_link_token;
+
+        $isPollStarted = $poll->sequence_id !== null;
+        $startGuard = $poll->close_after_start && $isPollStarted;
+
+        return $poll->enable_link_invite && !$startGuard && $tokenMatch;
+    }
+
+    public const BLUEPRINT_USER = [
+        "can_modify_poll" => false,
+        "can_control_flow" => false,
+        "can_see_progress" => false,
+        "can_answer" => true,
+    ];
+
+    public const BLUEPRINT_OWNER = [
+        "can_modify_poll" => true,
+        "can_control_flow" => true,
+        "can_see_progress" => true,
+        "can_answer" => true,
+    ];
 
 }

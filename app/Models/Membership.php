@@ -15,6 +15,15 @@ class Membership extends Model {
         /* 'id', 'user_id', */
     ];
 
+    protected $fillable = [
+        'poll_id',
+        'user_id',
+        'can_modify_poll',
+        'can_control_flow',
+        'can_see_progress',
+        'can_answer',
+    ];
+
     public function poll(): BelongsTo {
         return $this->belongsTo(Poll::class);
     }
