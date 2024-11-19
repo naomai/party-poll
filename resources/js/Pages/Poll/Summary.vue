@@ -9,6 +9,7 @@ import { ref } from 'vue';
 import EditQuestion from './Partials/EditQuestion.vue';
 import Question from './Partials/Question.vue';
 import AllowedActions from './Partials/AllowedActions.vue';
+import InviteQrCode from './Partials/InviteQrCode.vue';
 
 
 const page = usePage();
@@ -29,6 +30,7 @@ const canSeeAllQuestions = computed(() =>
 
 const clientState = reactive({
     editing: false,
+    viewingQr: false,
 })
 
 </script>
@@ -87,5 +89,8 @@ const clientState = reactive({
     <pre>
 {{ page.props }}
     </pre>
+    <Modal :show="clientState.viewingQr">
+        <InviteQrCode :poll="info" @close="clientState.viewingQr = false"></InviteQrCode>
+    </Modal>
     </AuthenticatedLayout>
 </template>

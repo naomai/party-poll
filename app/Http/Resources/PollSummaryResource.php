@@ -27,7 +27,9 @@ class PollSummaryResource extends PollBasicInfoResource {
             'links' => [
                 'questions' => $this->getUrlQuestionsAttribute(),
                 'state' => $this->getUrlStateAttribute(),
-            ]
+                'invite' => $this->getUrlInvitation(),
+            ],
+            
         ];
 
         return array_merge($base, $extension);
@@ -39,5 +41,12 @@ class PollSummaryResource extends PollBasicInfoResource {
     }
     public function getUrlStateAttribute(): string {
         return route("api.poll.state", $this->id);
+    }
+
+    public function getUrlInvitation(): string {
+        if(!$this->enable_link_invite) {
+            return null;
+        }
+        return route("invite.view", ['poll'=>$this->id, 'accesskey'=>$this->access_link_token]);
     }
 }
