@@ -6,6 +6,7 @@ import { computed, reactive } from 'vue';
 import PollPropertiesForm from '../PollManagement/PollPropertiesForm.vue';
 import Modal from '@/Components/Modal.vue';
 import { ref } from 'vue';
+import PollItem from './Partials/PollItem.vue';
 
 
 const props = defineProps({
@@ -47,14 +48,9 @@ const hasPolls = computed(()=>
                     <div v-if="!hasPolls" class="text-gray-400 text-center px-6 py-6 w-full">You don't have any polls yet. Try creating one!</div>
                     <ul v-if="hasPolls" role="list" class="w-full divide-y  divide-gray-100 text-lg">
                         
-                        <li v-for="poll in polls" class="flex justify-between gap-x-6 py-5">
-                            <Link :href="route('polls.show', poll.id)">
-                                <div class="flex min-w-0 gap-x-4">
-                                    <div class="pl-6 min-w-0 flex-auto">
-                                        <p class="text-sm font-semibold leading-6 text-gray-900">{{ poll.title }}</p>
-                                        <p class="mt-1 truncate text-xs leading-5 text-gray-500">{{ poll.member_count }} ppl</p>
-                                    </div>
-                                </div>
+                        <li v-for="poll in polls" class="flex justify-between gap-x-6">
+                            <Link :href="route('polls.show', poll.id)" class="block w-full py-5">
+                                <PollItem :poll="poll" />
                             </Link>
                         </li>
                     </ul>
