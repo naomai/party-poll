@@ -22,7 +22,7 @@ class GuestUpgradeRequest extends FormRequest
      */
     public function rules(): array {
         return [
-            'name'=>['string', 'max:60'],
+            'name'=>['string', 'max:60', 'nullable'],
             'email'=>['email', 'max:100'],
             'password' => ['required_with:email', 'confirmed', Password::min(8)],
         ];
