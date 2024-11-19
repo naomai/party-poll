@@ -29,15 +29,20 @@ class GuestAccountController extends Controller {
         $guest = User::create($guestInfo);
 
         Auth::login($guest, remember: true);
-        session()->regenerate();       
-        
-        if(session()->has('invite_poll')) {
-            $pollId = session()->get('invite_poll');
-            $invitationToken = session()->get('invite_token');
 
-            return redirect(route('invitation.consume', [
+        $session = session();
+        $session->regenerate();       
+        
+        if($session->has('invite_poll')) {
+            $pollId = $session->get('invite_poll');
+            $invitationToken = $session->get('invite_token');
+
+            $session->forget('invite_poll');
+            $session->forget('invite_token');
+            
+            return redirect(route('invite.view', [
                     'poll'=>$pollId,
-                    'token'=>$invitationToken,
+                    'accesskey'=>$invitationToken,
                 ]
             ), 303);
         }
