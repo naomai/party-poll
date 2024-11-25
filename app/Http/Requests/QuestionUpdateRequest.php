@@ -15,6 +15,7 @@ class QuestionUpdateRequest extends FormRequest {
         return [
             'question' => ['string', 'max:255'],
             'poll_sequence_id' => ['integer'],
+            'type' => ['required', Rule::in(['input','range','rating','select'])],
             'response_params' => ['array'],
 
         ];

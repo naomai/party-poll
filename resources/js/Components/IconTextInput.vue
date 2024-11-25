@@ -12,6 +12,12 @@ const props = defineProps({
     },
     name: {
         type: String,
+    },
+    placeholder: {
+        type: String,
+    },
+    required: { 
+        type: Boolean,
     }
 })
 
@@ -34,6 +40,8 @@ defineExpose({ focus: () => input.value.focus() });
             v-model="model"
             ref="input"
             class=""
+            :placeholder="placeholder"
+            :required="required"
         />
     </div>
 </template>

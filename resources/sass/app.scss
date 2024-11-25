@@ -6,3 +6,48 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+    --app-primary-color: #8d38d3;
+}
+
+.select-group {
+    --selectable-border: #aaa;
+    --selectable-bg: #ddd;
+    --selectable-active-border: oklch(from var(--primary-color) calc(l + 0.05) calc(c - 0) h);
+    --selectable-active-bg: oklch(from var(--primary-color) calc(l + 0.45) calc(c - 0) h);
+
+    display: inline-flex;
+    
+    box-sizing: border-box;
+    border-collapse: collapse;
+
+    & > .option:first-child {
+        border-top-left-radius: 3pt;
+        border-bottom-left-radius: 3pt;
+    }
+
+    & > .option + .option {
+        margin-left: -1px;
+    }
+
+    & > .option:last-child {
+        border-top-right-radius: 3pt;
+        border-bottom-right-radius: 3pt;
+    }
+
+    & > .option {
+        background-color: var(--selectable-bg);
+        border: 1px solid var(--selectable-border);
+        input[type=radio] {
+            display: none;
+        }
+        font-size: 10pt;
+        padding: 3px;
+    }
+
+    & > .option:has(input:checked) {
+        border-color: var(--selectable-active-border);
+        background-color: var(--selectable-active-bg);
+        z-index: 1;
+    }
+}

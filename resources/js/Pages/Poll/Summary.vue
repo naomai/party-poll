@@ -1,7 +1,7 @@
 <script setup>
 import ListAddButton from '@/Components/ListAddButton.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, usePage } from '@inertiajs/vue3';
+import { Head, router, usePage } from '@inertiajs/vue3';
 import { computed, reactive } from 'vue';
 import PollPropertiesForm from '../PollManagement/PollPropertiesForm.vue';
 import Modal from '@/Components/Modal.vue';
@@ -10,15 +10,16 @@ import EditQuestion from './Partials/EditQuestion.vue';
 import Question from './Partials/Question.vue';
 import AllowedActions from './Partials/AllowedActions.vue';
 import InviteQrCode from './Partials/InviteQrCode.vue';
+import axios from 'axios';
 
 
 const page = usePage();
 const info = page.props.info;
-const questions = computed(()=>page.props.questions);
+const questions = reactive(page.props.questions);
 const membership = page.props.membership;
 
 const hasQuestions = computed(() =>
-    questions.value.length > 0
+    questions.length > 0
 );
 
 const hasMoreQuestions = ref(page.props.state.more_questions);
@@ -31,7 +32,65 @@ const canSeeAllQuestions = computed(() =>
 const clientState = reactive({
     editing: false,
     viewingQr: false,
+
 })
+
+const createQuestion = () => {
+    let newQuestion = {uncommitted: Math.random()};
+    questions.push(newQuestion);
+}
+
+const updateQuestion = (question) => {
+    let q = {
+        id: question.id,
+        uncommitted: question.uncommitted,
+        sequence_id: question.sequence_id,
+        question: question.question,
+        type: question.type,
+        response_params: question.response_params,
+    };
+
+    if(typeof q.uncommitted != 'undefined' ) {
+        axios.post(
+            route("api.questions.store", {
+                poll: info.id,
+            }), 
+            q
+        ).then((response)=>{
+            question.id = response.data.id;
+            question.poll_sequence_id = response.data.poll_sequence_id;
+            delete question.uncommitted;
+        }).catch(()=>{
+
+        });
+    } else {
+        axios.patch(
+            route("api.questions.update", {
+                poll: info.id,
+                question: q.id,
+            }), 
+            q
+        );
+    }
+
+}
+
+const deleteQuestion = (q) => {
+    if(typeof q.uncommitted != 'undefined' ) {
+
+    } else {
+        axios.delete(
+            route("api.questions.destroy", {
+                poll: info.id,
+                question: q.id,
+            }), 
+            q
+        ).then(()=>{
+            let questionInArray = questions.find((question)=>question.id == q.id && question.uncommitted == q.uncommitted);
+            questions.splice(questions.indexOf(questionInArray), 1);
+        });
+    }
+}
 
 </script>
 
@@ -72,16 +131,19 @@ const clientState = reactive({
                             v-for="question in questions" 
                             :question="question" :poll-state="page.props.state"
                             :client-state="clientState"
+                            @update:question="updateQuestion"
+                            @delete="deleteQuestion"
+                            :key="question.id || question.uncommitted"
                         />
+                    </ul>
                         <div v-if="hasMoreQuestions && !page.props.state.waiting_me && page.props.state.waiting_others && !clientState.editing" class="text-gray-400 text-center px-6 py-6 w-full">
                             Waiting for others... ({{ page.props.state.others_responses_left }})
                         </div>
-                    </ul>
                     <div v-if="hasQuestions && !hasMoreQuestions && !page.props.state.waiting_me && !clientState.editing" class="text-gray-400 text-center px-6 py-6 w-full">
                         No more questions for you. Come back soon!
                     </div>
                     <div v-if="isAdmin && clientState.editing" class="self-center py-6">
-                        <ListAddButton class="" @click="inQuestion=true">New question</ListAddButton>
+                        <ListAddButton class="" @click="createQuestion()">New question</ListAddButton>
                     </div>
                 </div>
             </div>

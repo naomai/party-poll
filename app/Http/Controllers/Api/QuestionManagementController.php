@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\QuestionStoreRequest;
+use App\Http\Requests\QuestionUpdateRequest;
 use App\Models\Poll;
 use App\Models\Question;
 use App\Services\MembershipService;
@@ -36,10 +38,20 @@ class QuestionManagementController extends Controller {
 
 
     
-    public function store(Request $request) {
-        //
-    }
+    public function store(Poll $poll, QuestionStoreRequest $request) {
+        $this->authorize('update', $poll);
 
+        $user = Auth::user();
+
+        $validated = $request->validated();
+
+        $question = Question::make($validated);
+        $question->poll_id = $poll->id;
+        $question->owner_id = $user->id;
+        $question->save();
+
+        return $question;
+    }
     
     public function show(Poll $poll, Question $question): JsonResponse {
         $this->authorize('view', $question);
@@ -48,13 +60,20 @@ class QuestionManagementController extends Controller {
     }
 
     
-    public function update(Request $request, string $id) {
-        //
+    public function update(Poll $poll, Question $question, QuestionUpdateRequest $request) {
+        $this->authorize('update', $question);
+
+        $validated = $request->validated();
+
+        $question->update($validated);
+
+        return $question;
     }
 
     
-    public function destroy(string $id) {
-        //
+    public function destroy(Poll $poll, Question $question) {
+        $this->authorize('delete', $question);
+        $question->delete();
     }
 
 

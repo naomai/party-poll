@@ -14,7 +14,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::group([
-    'middleware' => 'auth:sanctum',
+    'middleware' => ['auth:sanctum','web'],
     'as' => 'api.',
     ], function () {
         Route::apiResource('/polls', PollManagementController::class);
@@ -30,17 +30,16 @@ Route::group([
                     ->name('index', 'poll.questions')
                     ->name('show', 'question.get');
 
-                Route::group([
+                /*Route::group([
                     'prefix' => 'questions/{question}',
                     'middleware' => ['auth:sanctum'],
                     ], function () { 
                         Route::get('answer', [AnswerController::class, 'view'])
                             ->name('question.answer');
 
-                        /*Route::get('participants_answers', [QuestionController::class, 'getAnswers'])
-                            ->name("poll.question.answer.list");*/
+
                     }
-                );
+                );*/
             }
         );
     }

@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Question extends Model {
     use HasFactory;
 
+    public $fillable = ['question', 'response_params', 'type'];
+
     public static function booting() {
         self::creating(function(Question $question) {
             $seqIdMax = Question::where('poll_id', '=', $question->poll_id)

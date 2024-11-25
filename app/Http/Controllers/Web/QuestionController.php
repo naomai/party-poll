@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\QuestionStoreRequest;
 use App\Models\Poll;
 use App\Models\Question;
 use App\Services\MembershipService;
@@ -18,7 +19,7 @@ class QuestionController extends Controller {
     use AuthorizesRequests;
     
     public function index(Poll $poll, PollStateService $service): Response {
-        //$this->authorize('index', Question::class);
+        $this->authorize('view', $poll);
         $user = Auth::user();
         $membership = MembershipService::getMembership($poll, $user);
 
@@ -48,7 +49,7 @@ class QuestionController extends Controller {
 
 
     
-    public function store(Request $request) {
+    public function store(Poll $poll, QuestionStoreRequest $request) {
         //
     }
 

@@ -22,6 +22,7 @@
         "@chenfengyuan/vue-qrcode": "^2.0.0",
         "@fortawesome/fontawesome-free": "^6.6.0",
         "apexcharts": "^4.0.0",
+        "lodash.debounce": "^4.0.8",
         "qrcode": "^1.5.4",
         "vue-star-rating": "^2.1.0",
         "vue3-apexcharts": "^1.7.0",

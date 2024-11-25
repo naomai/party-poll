@@ -13,6 +13,6 @@ const question = defineModel('question');
     <p>Options:</p>
     <div v-for="(option, index) in question.response_params.options">
         
-        <IconTextInput v-model="option.caption" class="option" icon="circle-question" />
+        <IconTextInput v-model="option.caption" class="option" icon="pizza-slice" />
     </div>
 </template>

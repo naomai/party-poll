@@ -1,7 +1,7 @@
 #poll-summary {
     --bg-section: #EEE;
     --bg-section-hover: #e0e0e0;
-    --bg-section-editing: #d6fbc5;
+    --editing-primary: #1ea7cd;
 
     @media (min-width: 1024px) {
         padding-left: 2rem;
@@ -95,8 +95,10 @@
 }
 
 #poll-summary.editing {
+    --primary-color: var(--editing-primary);
+
     ul.question-list{
-        background-color: var(--bg-section-editing);
+        background-color: oklch(from var(--primary-color) calc(l + 0.3) calc(c - 0.1) h);;
         .edit-lock {
             opacity: 0.5;
 
@@ -155,6 +157,10 @@
         margin-top: 0.75rem;
         margin-bottom: 0.75rem;
         padding: 0 0.5em;
+    }
+
+    .icon {
+        color: #999;
     }
 
     &:has(input:focus){

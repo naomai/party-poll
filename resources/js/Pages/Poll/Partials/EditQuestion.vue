@@ -1,9 +1,12 @@
 <script setup>
-import { computed, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
+import debounce from 'lodash.debounce';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import { useForm } from '@inertiajs/vue3';
 import EditSelect from './EditSelect.vue';
 import IconTextInput from '@/Components/IconTextInput.vue';
+import SelectGroup from '@/Components/SelectGroup.vue';
+import DangerButton from '@/Components/DangerButton.vue';
 
 const props = defineProps({
     question: {
@@ -18,11 +21,72 @@ const props = defineProps({
 });
 
 const allowEdit = computed(() => 
-    props.pollState.poll_state.published_seq < props.question.sequence_id
+    typeof props.question.id === 'undefined' ||
+        props.pollState.poll_state.published_seq === null ||
+        props.pollState.poll_state.published_seq < props.question.sequence_id
 );
 
-const questionUpdated = ()=>{
+const questionDraft = reactive(props.question);
 
+const responseTypes = ref([
+    {caption:'Selection',  icon: "list", value: 'select'},
+    {caption:'Text', icon: "keyboard", value: 'input'},
+    {caption:'Range', icon: "gauge-high", value: 'range'},
+    {caption:'Rating', icon: "star", value: 'rating'},
+]);
+
+const paramsForTypes = ref({
+    select: 
+        props.question.type=='select' ? props.question.response_params : {
+            options: [{'caption':''},{'caption':''},{'caption':''}],
+            max_selected: 1,
+        
+    },
+    input: 
+        props.question.type=='input' ? props.question.response_params : {
+            type: 'text',
+            max_length: '100',
+        },
+    range: 
+        props.question.type=='range' ? props.question.response_params : {
+            min: 0,
+            max: 10,
+        },
+    rating: 
+        props.question.type=='rating' ? props.question.response_params : {
+            
+        },
+});
+
+const responseType = ref(props.question.type);
+
+const emit = defineEmits([
+    'update:question',
+]);
+
+const changed = debounce(() => {
+    emit("update:question", questionDraft);
+}, 1000);
+
+
+onMounted(()=>{
+    if(!responseType.value) {
+        responseType.value = "select";
+    } else {
+        paramsForTypes[props.question.type] = props.question.response_params;
+    }
+});
+
+
+watch(questionDraft, changed);
+watch(responseType, ()=>{
+    let params = paramsForTypes.value[responseType.value];
+    questionDraft.response_params = params;
+    questionDraft.type = responseType.value;
+});
+
+const questionDelete = ()=>{
+    emit("delete", questionDraft);
 };
 
 
@@ -35,14 +99,28 @@ const questionUpdated = ()=>{
             :class="{'edit-lock': !allowEdit}"
         >
             <form @submit.prevent="submitQuestionProperties">
-                <div class="text-container">
-                    <IconTextInput v-if="allowEdit" v-model="question.question" name="question" />
-                    <p v-else>{{ question.question }}</p>
-                </div>
                 <div v-if="allowEdit" class="editor">
-                    <EditSelect v-if="question.type=='select'" :question="question" @update:question="questionUpdated" />
+                    <!-- EDITABLE -->
+                    <IconTextInput 
+                        v-if="allowEdit" 
+                        v-model="questionDraft.question" 
+                        name="question-text" 
+                        icon="circle-question"
+                        required 
+                        placeholder="Pepperoni or margherita?"
+                    />
+                    <SelectGroup 
+                        :options="responseTypes" 
+                        v-model="responseType"
+                    />
+                    <EditSelect v-if="questionDraft.type=='select'" :question="questionDraft" @update:question="changed" />
+                    <DangerButton @click="questionDelete">Delete question</DangerButton>
                 </div>
                 <div v-else class="editor">
+                    <!-- PUBLISH-LOCKED -->
+                    <div class="text-container">
+                        <p>{{ question.question }}</p>
+                    </div>
                     <svg 
                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" 
                         fill="currentColor" 
