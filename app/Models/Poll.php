@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\MembershipService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -60,9 +61,10 @@ class Poll extends Model {
     // ------
 
     public function getMembership(User $user): ?Membership {
-        $membership = $this->memberships
+        /*$membership = $this->memberships
             ->where('user_id', '=', $user->id)
-            ->first();
+            ->first();*/
+        $membership = MembershipService::getMembership($this, $user);
         return $membership;
     }
 
