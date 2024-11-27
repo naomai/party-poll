@@ -140,13 +140,16 @@ const collapsed = ref(typeof questionDraft.uncommitted === "undefined" && !quest
                             <EditSelect v-if="questionDraft.type=='select'" :question="questionDraft" @update:question="changed" />
                             <EditRange v-if="questionDraft.type=='range'" :question="questionDraft" @update:question="changed" />
                         </div>
-                        <DangerButton @click.stop="questionDelete">Delete question</DangerButton>
+                        <DangerButton @click.stop="questionDelete" class="question-delete">Delete question</DangerButton>
                     </VueCollapse>
                 </div>
                 <div v-else class="editor">
                     <!-- PUBLISH-LOCKED -->
                     <div class="text-container">
-                        <p>{{ question.question }}</p>
+                        <p>
+                            <div class="drag-handle">#{{ questionDraft.poll_sequence_id }}</div>
+                            {{ question.question }}
+                        </p>
                     </div>
                     <svg 
                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" 
