@@ -28,7 +28,7 @@ const editing = defineModel('editing')
         </div>
         -->
         <div 
-            class="action" 
+            class="action edit" 
             :class="{
                 'forbidden': !membership.modify_poll,
                 'active': clientState.editing,

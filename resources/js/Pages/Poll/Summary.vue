@@ -44,11 +44,12 @@ const updateQuestion = (question) => {
     let q = {
         id: question.id,
         uncommitted: question.uncommitted,
-        sequence_id: question.sequence_id,
+        poll_sequence_id: question.poll_sequence_id,
         question: question.question,
         type: question.type,
         response_params: question.response_params,
     };
+
 
     if(typeof q.uncommitted != 'undefined' ) {
         axios.post(
@@ -59,6 +60,7 @@ const updateQuestion = (question) => {
         ).then((response)=>{
             question.id = response.data.id;
             question.poll_sequence_id = response.data.poll_sequence_id;
+            question.justStored = true;
             delete question.uncommitted;
         }).catch(()=>{
 
@@ -76,8 +78,14 @@ const updateQuestion = (question) => {
 }
 
 const deleteQuestion = (q) => {
-    if(typeof q.uncommitted != 'undefined' ) {
 
+    const deleteFromLocalList = (q) => {
+        let questionInArray = questions.find((question)=>question.id == q.id && question.uncommitted == q.uncommitted);
+        questions.splice(questions.indexOf(questionInArray), 1);
+    }
+
+    if(typeof q.uncommitted != 'undefined' ) {
+        deleteFromLocalList(q);
     } else {
         axios.delete(
             route("api.questions.destroy", {
@@ -86,8 +94,7 @@ const deleteQuestion = (q) => {
             }), 
             q
         ).then(()=>{
-            let questionInArray = questions.find((question)=>question.id == q.id && question.uncommitted == q.uncommitted);
-            questions.splice(questions.indexOf(questionInArray), 1);
+            deleteFromLocalList(q);
         });
     }
 }
@@ -107,12 +114,13 @@ const deleteQuestion = (q) => {
         </template>
         <div class="py-12">
             <div id="poll-summary" 
+                class="app-islands"
                 :class="{editing: clientState.editing}"
             >
 
                 <AllowedActions :membership="membership" v-model:client-state="clientState" />
                 <div
-                    class="poll-questions"
+                    class="poll-questions app-island"
                     :class="{editing: clientState.editing}"
                 >
                     <div v-if="!hasQuestions" class="text-gray-400 text-center px-6 py-6 w-full">
@@ -148,11 +156,11 @@ const deleteQuestion = (q) => {
                 </div>
             </div>
         </div>
-    <pre>
-{{ page.props }}
-    </pre>
-    <Modal :show="clientState.viewingQr">
-        <InviteQrCode :poll="info" @close="clientState.viewingQr = false"></InviteQrCode>
+    <!--<pre>
+        {{ page.props }}
+    </pre>-->
+    <Modal :show="clientState.viewingQr" @close="clientState.viewingQr = false">
+        <InviteQrCode :poll="info"></InviteQrCode>
     </Modal>
     </AuthenticatedLayout>
 </template>

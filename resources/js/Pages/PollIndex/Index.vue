@@ -41,15 +41,15 @@ const hasPolls = computed(()=>
         </template>
 
         <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div class="app-islands">
                 <div
-                    class="overflow-hidden bg-white shadow-sm sm:rounded-lg flex justify-center gap-6 flex-wrap"
+                    class="app-island"
                 >
                     <div v-if="!hasPolls" class="text-gray-400 text-center px-6 py-6 w-full">You don't have any polls yet. Try creating one!</div>
-                    <ul v-if="hasPolls" role="list" class="w-full divide-y  divide-gray-100 text-lg">
+                    <ul v-if="hasPolls" role="list" class="poll-index-list">
                         
-                        <li v-for="poll in polls" class="flex justify-between gap-x-6">
-                            <Link :href="route('polls.show', poll.id)" class="block w-full py-5">
+                        <li v-for="poll in polls" class="poll-index-list-item">
+                            <Link :href="route('polls.show', poll.id)" class="poll-link">
                                 <PollItem :poll="poll" />
                             </Link>
                         </li>
@@ -60,7 +60,7 @@ const hasPolls = computed(()=>
                 </div>
             </div>
         </div>
-        <Modal :show="inPollInfoEditor">
+        <Modal :show="inPollInfoEditor" @close="inPollInfoEditor=false">
             <PollPropertiesForm :poll="pollToEdit" @create="inPollInfoEditor=false"></PollPropertiesForm>
         </Modal>
     </AuthenticatedLayout>

@@ -18,7 +18,10 @@ const props = defineProps({
     },
     required: { 
         type: Boolean,
-    }
+    },
+    autofocus: { 
+        type: Boolean,
+    },
 })
 
 const input = ref(null);
@@ -42,6 +45,7 @@ defineExpose({ focus: () => input.value.focus() });
             class=""
             :placeholder="placeholder"
             :required="required"
+            :autofocus="autofocus"
         />
     </div>
 </template>

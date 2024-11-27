@@ -13,7 +13,7 @@ const props = defineProps({
     poll: [Object],
 });
 
-defineEmits([
+const emit = defineEmits([
     'create',
     'save',
 ])
@@ -58,7 +58,7 @@ const submitPollProperties = () => {
                 <TextInput
                     id="title"
                     type="text"
-                    class="mt-1 block w-full"
+                    class="full-width"
                     v-model="form.title"
                     required
                     autofocus

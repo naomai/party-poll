@@ -15,6 +15,7 @@ const groupId = 'selgrp'+getCurrentInstance().uid;
     <div class="select-group">
         <div v-for="(option, idx) in props.options"
             class="option"
+            @click="model = option.value"
         >
             <i v-if="option.icon" class="fa icon" :class="'fa-'+option.icon"></i>
             <input 

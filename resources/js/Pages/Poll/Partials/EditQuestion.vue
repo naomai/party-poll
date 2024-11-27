@@ -7,6 +7,9 @@ import EditSelect from './EditSelect.vue';
 import IconTextInput from '@/Components/IconTextInput.vue';
 import SelectGroup from '@/Components/SelectGroup.vue';
 import DangerButton from '@/Components/DangerButton.vue';
+import EditRange from './EditRange.vue';
+import VueCollapse from 'vue3-collapse';
+import CollapseChevron from '@/Components/CollapseChevron.vue';
 
 const props = defineProps({
     question: {
@@ -23,13 +26,13 @@ const props = defineProps({
 const allowEdit = computed(() => 
     typeof props.question.id === 'undefined' ||
         props.pollState.poll_state.published_seq === null ||
-        props.pollState.poll_state.published_seq < props.question.sequence_id
+        props.pollState.poll_state.published_seq < props.question.poll_sequence_id
 );
 
 const questionDraft = reactive(props.question);
 
 const responseTypes = ref([
-    {caption:'Selection',  icon: "list", value: 'select'},
+    {caption:'Options',  icon: "list", value: 'select'},
     {caption:'Text', icon: "keyboard", value: 'input'},
     {caption:'Range', icon: "gauge-high", value: 'range'},
     {caption:'Rating', icon: "star", value: 'rating'},
@@ -61,7 +64,7 @@ const paramsForTypes = ref({
 const responseType = ref(props.question.type);
 
 const emit = defineEmits([
-    'update:question',
+    'update:question', "delete"
 ]);
 
 const changed = debounce(() => {
@@ -89,32 +92,57 @@ const questionDelete = ()=>{
     emit("delete", questionDraft);
 };
 
+const collapsed = ref(typeof questionDraft.uncommitted === "undefined" && !questionDraft.justStored);
+
 
 </script>
 
 <template>
-    <li>
+    <li         
+        :class="{collapsed: collapsed}"
+        @click="collapsed = false"
+    >
         <div
             class="question" 
             :class="{'edit-lock': !allowEdit}"
         >
             <form @submit.prevent="submitQuestionProperties">
+                
+                
                 <div v-if="allowEdit" class="editor">
                     <!-- EDITABLE -->
-                    <IconTextInput 
-                        v-if="allowEdit" 
-                        v-model="questionDraft.question" 
-                        name="question-text" 
-                        icon="circle-question"
-                        required 
-                        placeholder="Pepperoni or margherita?"
-                    />
-                    <SelectGroup 
-                        :options="responseTypes" 
-                        v-model="responseType"
-                    />
-                    <EditSelect v-if="questionDraft.type=='select'" :question="questionDraft" @update:question="changed" />
-                    <DangerButton @click="questionDelete">Delete question</DangerButton>
+
+                         <div class="text-container">
+                            
+                            <p v-if="collapsed">
+                                <div class="drag-handle">#{{ questionDraft.poll_sequence_id }}</div>
+                                {{ questionDraft.question }}
+                            </p>
+                            <IconTextInput 
+                                v-else 
+                                v-model="questionDraft.question" 
+                                name="question-text" 
+                                class="full-width"
+                                icon="circle-question"
+                                placeholder="Pepperoni or margherita?"
+                                autofocus 
+                            />
+
+                            <CollapseChevron v-model:collapsed="collapsed"/>
+
+                        </div>
+                    <VueCollapse duration="250" :model-value="!collapsed" easing="var(--timing-bouncy)">
+                        
+                        <SelectGroup 
+                            :options="responseTypes" 
+                            v-model="responseType"
+                        />
+                        <div class="response-params-config">
+                            <EditSelect v-if="questionDraft.type=='select'" :question="questionDraft" @update:question="changed" />
+                            <EditRange v-if="questionDraft.type=='range'" :question="questionDraft" @update:question="changed" />
+                        </div>
+                        <DangerButton @click.stop="questionDelete">Delete question</DangerButton>
+                    </VueCollapse>
                 </div>
                 <div v-else class="editor">
                     <!-- PUBLISH-LOCKED -->

@@ -1,7 +1,6 @@
 #poll-summary {
-    --bg-section: #EEE;
-    --bg-section-hover: #e0e0e0;
-    --editing-primary: #1ea7cd;
+    --bg-section-hover: oklch(from var(--app-island-bg) calc(l + 0.1) calc(c - 0.0) h);
+    
 
     @media (min-width: 1024px) {
         padding-left: 2rem;
@@ -17,13 +16,13 @@
         border-radius: 0.5rem;
     }
 
-    box-shadow: 0 1px 2px 0 #0000000d;
+    /*box-shadow: 0 1px 2px 0 #0000000d;
     background-color: #ffffff;
     overflow: hidden;
     gap: 1.5rem;
     justify-content: center;
     flex-wrap: wrap;
-    display: flex;
+    display: flex;*/
 
     .question-list {
         font-size: 1.125rem;
@@ -31,10 +30,9 @@
         width: 100%;
     }
 
-    ul > :not([hidden]) ~ :not([hidden]) {
-        border-top-width: 1px;
-        border-bottom-width: 1px;
-        border-color: #f3f4f6;
+    ul > li {
+        border-bottom-width: 1px; 
+        border-color: var(--app-island-cutout-bg); 
     }
 }
 
@@ -45,10 +43,14 @@
         justify-content: space-between;
         -moz-column-gap: 1.5rem;
         column-gap: 1.5rem;
-        cursor: pointer;
         transition: background-color 0.1s ease;
+        
 
-        &.collapsed:hover {
+        &.collapsed {
+            cursor: pointer;
+        }
+
+        &.collapsed:hover, & .collapse-chevron:hover {
             background-color: var(--bg-section-hover);
         }
 
@@ -61,18 +63,29 @@
             justify-content: space-between;
 
             p, input[type=text] {
-                color: #222;
+                /*color: #222;*/
                 line-height: 1.5rem;
                 font-weight: 600;
                 font-size: 0.875rem;
             }
+
+            .drag-handle {
+                display: inline-block;
+                opacity: 0.7;
+            }
         }
 
         .question .text-container .collapse-chevron {
-            width: 1rem;
-            height: 1rem;
+            width: 2rem;
+            height: 2rem;
+            padding: 0.5rem;
             transform: rotate(180deg);
-            transition: transform 0.3s var(--timing-bouncy);
+            transition: 
+                transform 0.3s var(--timing-bouncy),
+                background-color 0.2s ease,
+                ;
+            cursor: pointer;
+            clip-path: circle(50%);
         }
 
         &.collapsed .question .text-container .collapse-chevron {
@@ -94,11 +107,22 @@
     }
 }
 
-#poll-summary.editing {
-    --primary-color: var(--editing-primary);
+#poll-summary.editing  {
+    * {
+        --primary-color: var(--app-state-editing);
+        --app-island-cutout-bg: var(--primary-color);
+    }
+
+    .poll-questions {
+        border: 2px solid oklch(from var(--primary-color) calc(l - 0.0) calc(c - 0.0) h);
+    }
 
     ul.question-list{
-        background-color: oklch(from var(--primary-color) calc(l + 0.3) calc(c - 0.1) h);;
+        /*background-color: oklch(from var(--primary-color) calc(l + 0.3) calc(c - 0.1) h);*/
+        & > .li {
+            border-color: oklch(from var(--primary-color) calc(l + 0.0) calc(c - 0.1) h);
+        }
+
         .edit-lock {
             opacity: 0.5;
 
@@ -112,6 +136,36 @@
                 display: inline-block;
             }
         }
+
+        .select-group {
+            color: oklch(from var(--primary-color) calc(l - 0.2) calc(c - 0.1) h);
+
+        }
+
+        .option-delete {
+            --danger-color: #c13434;
+            --danger-pale: #f9d5d5;
+            padding: 3px;
+            border: 1px solid var(--danger-color);
+            background-color: var(--danger-pale);
+            color: var(--danger-color);
+            border-radius: 5px;
+            width: 32px;
+            height: 32px;
+            margin-left: 6px;
+
+            .icon {
+                font-size: 10pt;
+            }
+
+            &:hover {
+                background-color: var(--danger-color);
+                color: var(--danger-pale);
+            }
+            &:active {
+                box-shadow: inset 0px 2px 3px #00000033;
+            }
+        }
     }
 }
 
@@ -120,57 +174,34 @@
     align-items: flex-start;
     display: flex;
     .action {
-        width: 30px;
-        height: 30px;
+        width: 50px;
+        height: 50px;
         --tw-bg-opacity: 1;
         background-color: rgb(55 65 81 / var(--tw-bg-opacity));
         border-radius: 9999px;
         display: inline-flex;
+
+
 
         &.forbidden {
             opacity: 0.5;
         }
 
         &.active {
-            background-color: #272;
+            background-color: var(--app-cue-info);
+        }
+
+        &.edit.active {
+            background-color: var(--app-state-editing);
         }
 
         svg {
             fill: #fff;
-            width: 1.15rem;
-            height: 1.15rem;
-            margin-top: 0.35rem;
-            margin-left: 0.39rem;
+            width: 70%;
+            height: 70%;
+            margin-top: 0.45rem;
+            margin-left: 0.47rem;
         }
+        
     }
 } 
-
-.input-iconized {
-    & {
-        display: flex;
-        align-items: center;
-        max-width: 30rem;
-        box-shadow: 0 1px 2px 0 #0000000d;
-        background-color: #ffffff;
-        border-color: #6b7280;
-        border-radius: 0.375rem;
-        margin-top: 0.75rem;
-        margin-bottom: 0.75rem;
-        padding: 0 0.5em;
-    }
-
-    .icon {
-        color: #999;
-    }
-
-    &:has(input:focus){
-        outline: 2px solid #68C;
-    }
-
-    input, input:focus {
-        --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(0px + var(--tw-ring-offset-width)) var(--tw-ring-color);
-        border: none;
-        flex: 1;
-        outline: none;
-    }
-}
