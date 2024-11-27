@@ -33,7 +33,7 @@ class QuestionResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'sequence_id' => $this->poll_sequence_id,
+            'poll_sequence_id' => $this->poll_sequence_id,
             'question' => $this->question,
             'type' => $this->type,
             'response_params' => $this->response_params,
