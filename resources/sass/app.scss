@@ -21,6 +21,8 @@
     --app-island-inset-bg: oklch(from var(--app-island-bg) calc(l - 0.1) calc(c) h);
     --app-island-inset-focus-bg: oklch(from var(--app-island-bg) calc(l + 0.4) calc(c) h);
 
+    --app-island-outset-bg: oklch(from var(--app-island-bg) calc(l * 1.9) calc(c) h);
+
 }
 
 #app-backdrop {
@@ -189,10 +191,11 @@
     }
 }
 
-button.add-item {
-    --button-hover-bg: oklch(from var(--app-state-editing) calc(l - 0.1) calc(c - 0.0) h);;
-    --button-focusring-bg: oklch(from var(--app-state-editing) calc(l + 0.1) calc(c - 0.0) h);;
-    --button-pressing-bg: oklch(from var(--app-state-editing) calc(l - 0.2) calc(c - 0.0) h);;
+button {
+    --button-bg: var(--app-island-outset-bg);
+    --button-hover-bg: oklch(from var(--button-bg) calc(l - 0.1) calc(c - 0.0) h);;
+    --button-focusring-bg: oklch(from var(--button-bg) calc(l + 0.1) calc(c - 0.0) h);;
+    --button-pressing-bg: oklch(from var(--button-bg) calc(l - 0.2) calc(c - 0.0) h);;
 
     display: inline-flex; 
     padding-top: 0.5rem;
@@ -209,12 +212,17 @@ button.add-item {
     letter-spacing: 0.1em; 
     color: #ffffff; 
     text-transform: uppercase; 
-    background-color: var(--app-state-editing); 
+    background-color: var(--button-bg); 
     transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 300ms; 
     transition-duration: 150ms; 
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); 
+
+    box-shadow: 0 2px 3px #0001; 
+    height: 42px;
+
+    gap: 4px;
 
     &:hover {
         background-color: var(--button-hover-bg); 
@@ -231,6 +239,10 @@ button.add-item {
         background-color: var(--button-pressing-bg); 
     }
 
+}
+
+button.add-item {
+    --button-bg: var(--app-state-editing);
 }
 
 .input-regular {
