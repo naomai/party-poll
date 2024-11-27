@@ -99,12 +99,11 @@ const collapsed = ref(typeof questionDraft.uncommitted === "undefined" && !quest
 
 <template>
     <li         
-        :class="{collapsed: collapsed}"
+        :class="{collapsed: collapsed, 'edit-lock': !allowEdit}"
         @click="collapsed = false"
     >
         <div
             class="question" 
-            :class="{'edit-lock': !allowEdit}"
         >
             <form @submit.prevent="submitQuestionProperties">
                 
