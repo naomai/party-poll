@@ -97,7 +97,7 @@ const submit = () => {
                             </PrimaryButton>
                         </div>
                     </form>
-                    <div v-else
+                    <div v-else-if="question.stats!==null"
                         class="response-stats"
                     >
                         <StatsChart v-if="question.stats.type=='options'" :stats="question.stats" />
