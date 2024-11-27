@@ -71,6 +71,8 @@ class PollStateService {
      * Validate poll state, and perform recovery when invalid.
      */
     public static function ensureStateValidity(Poll $poll): void {
+        self::fixSequenceId($poll);
+
         if($poll->wait_for_everybody) {
             $state = static::getPollState($poll);
             if($state['started'] && !$state['blocking'] && $state['more_questions']) {
@@ -95,6 +97,43 @@ class PollStateService {
             $poll->sequence_id = $next->poll_sequence_id;
             $poll->save();
         }
+    }
+
+    /** fixSequenceId
+     * Ensures that all poll questions have valid SequenceIds,
+     * ie. they start at 1, and increase continuously
+     * Additionally, ensure valid SequenceId references in Poll record
+     */
+    private static function fixSequenceId($poll): void {
+        $questions = $poll->questions->sortBy('poll_sequence_id')->all();
+
+        $publishedSeqId = $poll->published_sequence_id;
+        $currentSeqId = $poll->sequence_id;
+        
+        $validSeqId = 1;
+        foreach($questions as $question) {
+            $questionSeqId = $question->poll_sequence_id;
+            if($questionSeqId != $validSeqId) {
+                $question->poll_sequence_id = $validSeqId;
+                if($publishedSeqId == $questionSeqId) {
+                    $poll->published_sequence_id = $validSeqId;
+                }
+                if($currentSeqId == $questionSeqId) {
+                    $poll->sequence_id = $validSeqId;
+                }
+                $question->save();
+            }
+            $validSeqId++;
+        }
+
+        if($poll->published_sequence_id >= $validSeqId) {
+            $poll->published_sequence_id = $validSeqId;
+        }
+        if($poll->sequence_id >= $validSeqId) {
+            $poll->sequence_id = $validSeqId;
+        }
+
+        $poll->save();
     }
 
     /** getBlockingQuestion
@@ -208,16 +247,20 @@ class PollStateService {
         if($isWaitForAll) {
             $sequenceId = $poll->sequence_id;
         } else {
+            $sequenceId = null;
             $questionStates = static::getQuestionAnswerPairsSequence($membership);
 
             $firstWithoutAnswer = $questionStates->first(
                 fn($state) => $state['answer']==null
             );
-            $sequenceId = $firstWithoutAnswer['question']->poll_sequence_id;
+
+            if($firstWithoutAnswer!==null) {
+                $sequenceId = $firstWithoutAnswer['question']->poll_sequence_id;
+            }
         }
 
         if($sequenceId === null) {
-            return null;
+            return collect();
         }
 
         return $questions->where('poll_sequence_id', '<=', $sequenceId)->get();
