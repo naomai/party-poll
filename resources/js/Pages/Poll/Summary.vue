@@ -11,6 +11,7 @@ import Question from './Partials/Question.vue';
 import AllowedActions from './Partials/AllowedActions.vue';
 import InviteQrCode from './Partials/InviteQrCode.vue';
 import axios from 'axios';
+import SecondaryButton from '@/Components/SecondaryButton.vue';
 
 
 const page = usePage();
@@ -150,8 +151,9 @@ const deleteQuestion = (q) => {
                     <div v-if="hasQuestions && !hasMoreQuestions && !page.props.state.waiting_me && !clientState.editing" class="text-gray-400 text-center px-6 py-6 w-full">
                         No more questions for you. Come back soon!
                     </div>
-                    <div v-if="isAdmin && clientState.editing" class="self-center py-6">
+                    <div v-if="isAdmin && clientState.editing" class="edit-buttons self-center py-6">
                         <ListAddButton class="" @click="createQuestion()">New question</ListAddButton>
+                        <SecondaryButton><i class="fa-solid fa-person-chalkboard"></i> Reveal</SecondaryButton>
                     </div>
                 </div>
             </div>
