@@ -59,6 +59,16 @@ class PollManagementService {
         //
     }
 
+    public function publishQuestions(Poll $poll) {
+        PollStateService::ensureStateValidity($poll);
+        $maxSequenceId = $poll->questions->max('poll_sequence_id');
+        $poll->published_sequence_id = $maxSequenceId;
+        if($poll->sequence_id === null && $maxSequenceId !== null) {
+            $poll->sequence_id = 1;
+        }
+        $poll->save();
+    }
+
     public function regenerateInvitationToken(Poll $poll) : string {
         // faker uses mt_rand internally, which is not cryptographically safe
         $randomWords = fake()->words(3, false);

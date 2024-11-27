@@ -50,5 +50,10 @@ class PollController extends Controller {
         $pollSummary = $manage->update($poll, $request->validated());
         return response()->noContent();
     }
+
+    public function publishQuestions(Poll $poll, PollManagementService $manage) {
+        $pollSummary = $manage->publishQuestions($poll);
+        return response()->noContent();
+    }
     
 }
