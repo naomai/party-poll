@@ -24,7 +24,7 @@ class AnswerController extends Controller {
         
         return to_route("polls.show", [
             'poll'=>$question->poll->id
-        ]); 
+        ], 303); 
     }
 
     /**
