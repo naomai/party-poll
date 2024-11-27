@@ -1,25 +1,38 @@
 <script setup>
-import { computed, reactive, ref, useTemplateRef } from 'vue';
+import { computed, reactive, ref, useTemplateRef, watch } from 'vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import { useForm } from '@inertiajs/vue3';
 import IconTextInput from '@/Components/IconTextInput.vue';
 
 
-const question = defineModel('question');
+
+const props = defineProps(['question'])
+const emit = defineEmits(['update:question'])
+
+const optionsLocal = reactive(props.question.response_params.options);
 
 const deleteOption = (idx)=>{
-    question.value.response_params.options.splice(idx, 1);
+    optionsLocal.splice(idx, 1);
 };
 
 const addOption = () => {
-    question.value.response_params.options.push({caption: "", newOption: true});
+    optionsLocal.push({caption: "", newOption: true});
 }
+
+watch(optionsLocal, (o)=>{
+    let optionsFiltered = o.filter(
+        (e)=>
+            e.caption!=null
+    );
+    props.question.response_params.options = optionsFiltered;
+    emit("update:question", props.question);
+});
 
 </script>
 
 <template>
     <p>Options:</p>
-    <div v-for="(option, index) in question.response_params.options">
+    <div v-for="(option, index) in optionsLocal">
         
         <IconTextInput v-model="option.caption" class="option full-width" icon="pizza-slice" :autofocus="option.newOption" />
         <button class="option-delete" @click="deleteOption(index)"><i class="fa icon fa-trash"></i></button>

@@ -24,7 +24,7 @@ class QuestionStoreRequest extends FormRequest {
             'response_params.max' => ['exclude_unless:type,range','required', 'integer', "gt:response_params.min"],
 
             'response_params.options' => ['exclude_unless:type,select',"required", "array", "between:1,20"],
-            'response_params.options.*.caption' => ['exclude_unless:type,select',"present", "string", "nullable", "between:0,500"],
+            'response_params.options.*.caption' => ['exclude_unless:type,select',"present", "string", "between:0,500"],
             'response_params.max_selected' => ['exclude_unless:type,select','required', 'integer', "between: 0, 20"],
 
 
