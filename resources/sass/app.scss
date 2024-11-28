@@ -353,3 +353,12 @@ button.add-item {
 
 }
 
+
+.inline-warning {
+    display: grid;
+    grid-template-columns: 1fr fit-content(30px) fit-content(30px);
+    gap: 5px;
+    align-items: baseline;
+    margin-top: 6pt;
+    margin-bottom: 6pt;
+}

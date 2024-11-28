@@ -12,11 +12,13 @@ import AllowedActions from './Partials/AllowedActions.vue';
 import InviteQrCode from './Partials/InviteQrCode.vue';
 import axios from 'axios';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
+import InlineWarning from '@/Components/InlineWarning.vue';
 
 
 const page = usePage();
 const info = page.props.info;
 const questions = reactive(page.props.questions);
+const questionsAll = reactive(page.props.questions_privileged);
 const membership = page.props.membership;
 
 const hasQuestions = computed(() =>
@@ -30,6 +32,14 @@ const canSeeAllQuestions = computed(() =>
     membership.modify_poll || membership.see_progress
 );
 
+const hasUnpublished = computed(()=>
+    questions.reduce((a, current)=>
+        a ||
+        page.props.state.poll_state.published_seq === null ||
+        page.props.state.poll_state.published_seq < current.poll_sequence_id
+    , false)
+);
+
 const clientState = reactive({
     editing: false,
     viewingQr: false,
@@ -38,7 +48,7 @@ const clientState = reactive({
 
 const createQuestion = () => {
     let newQuestion = {uncommitted: Math.random()};
-    questions.push(newQuestion);
+    questionsAll.push(newQuestion);
 }
 
 const updateQuestion = (question) => {
@@ -73,7 +83,7 @@ const updateQuestion = (question) => {
                 question: q.id,
             }), 
             q
-        );
+        ).then(()=>{});
     }
 
 }
@@ -98,7 +108,17 @@ const deleteQuestion = (q) => {
             deleteFromLocalList(q);
         });
     }
-}
+};
+
+const publishQuestions = () => {
+    router.post(route("polls.publish", {poll: info.id}), {}, {
+        only: ['info', 'state'], 
+        preserveState: true,
+        preserveScroll: true,
+    });
+};
+
+const publishWarning = ref(null); //useTemplateRef('publishWarning');
 
 </script>
 
@@ -118,7 +138,7 @@ const deleteQuestion = (q) => {
                 class="app-islands"
                 :class="{editing: clientState.editing}"
             >
-
+                {{ hasUnpublished }}
                 <AllowedActions :membership="membership" v-model:client-state="clientState" />
                 <div
                     class="poll-questions app-island"
@@ -137,7 +157,7 @@ const deleteQuestion = (q) => {
                             :client-state="clientState"
                         />
                         <EditQuestion v-else
-                            v-for="question in questions" 
+                            v-for="question in questionsAll" 
                             :question="question" :poll-state="page.props.state"
                             :client-state="clientState"
                             @update:question="updateQuestion"
@@ -153,14 +173,15 @@ const deleteQuestion = (q) => {
                     </div>
                     <div v-if="isAdmin && clientState.editing" class="edit-buttons self-center py-6">
                         <ListAddButton class="" @click="createQuestion()">New question</ListAddButton>
-                        <SecondaryButton><i class="fa-solid fa-person-chalkboard"></i> Reveal</SecondaryButton>
+                        <SecondaryButton v-if="hasUnpublished" @click="publishWarning.show()"><i class="fa-solid fa-person-chalkboard"></i> Reveal</SecondaryButton>
                     </div>
+                    <InlineWarning class="publish-warning" ref='publishWarning' @confirm="publishQuestions">Reveal questions? You won't be able to edit them.</InlineWarning>
                 </div>
             </div>
         </div>
-    <!--<pre>
+    <pre>
         {{ page.props }}
-    </pre>-->
+    </pre>
     <Modal :show="clientState.viewingQr" @close="clientState.viewingQr = false">
         <InviteQrCode :poll="info"></InviteQrCode>
     </Modal>

@@ -52,8 +52,10 @@ class PollController extends Controller {
     }
 
     public function publishQuestions(Poll $poll, PollManagementService $manage) {
-        $pollSummary = $manage->publishQuestions($poll);
-        return response()->noContent();
+        $manage->publishQuestions($poll);
+        return to_route("polls.show", [
+            'poll' => $poll->id
+        ], 303);
     }
     
 }

@@ -16,7 +16,8 @@ Route::put("/guest_upgrade", [GuestAccountController::class, 'store'])
 
 Route::middleware(['auth:sanctum'])->group(function(){
     Route::resource('/polls', PollController::class);
-    Route::get('/polls/{poll}/publish', [PollController::class, 'publishQuestions']);
+    Route::post('/polls/{poll}/publish', [PollController::class, 'publishQuestions'])
+        ->name('polls.publish');
     Route::put('/questions/{question}/answer', [AnswerController::class, "store"])
         ->name('question.answer.store');
 });

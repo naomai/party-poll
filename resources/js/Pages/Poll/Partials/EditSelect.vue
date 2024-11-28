@@ -22,7 +22,7 @@ const addOption = () => {
 watch(optionsLocal, (o)=>{
     let optionsFiltered = o.filter(
         (e)=>
-            e.caption!=null
+            e.caption!=null && e.caption!=""
     );
     props.question.response_params.options = optionsFiltered;
     emit("update:question", props.question);

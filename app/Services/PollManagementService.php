@@ -43,6 +43,7 @@ class PollManagementService {
         $response['info'] = new PollSummaryResource($poll);
         $response['state'] = PollStateService::getMemberState($membership);
         $response['questions'] = self::getQuestionList($poll);
+        $response['questions_privileged'] = self::getQuestionListPrivileged($poll);
         $response['membership'] = MembershipService::getAllowedActions($membership); 
 
         return $response;
@@ -81,6 +82,19 @@ class PollManagementService {
 
     private static function getQuestionList(Poll $poll) {
         $user = Auth::user();
+        $membership = MembershipService::getMembership($poll, $user);        
+
+        $questions = PollStateService::getAccessibleQuestions($membership);
+        $questions = $questions->map(function($q) { 
+            $q->revealed = true;
+            return $q;
+        });
+        
+        return QuestionResource::collection($questions);
+    }
+
+    private static function getQuestionListPrivileged(Poll $poll) {
+        $user = Auth::user();
         $membership = MembershipService::getMembership($poll, $user);
         
         $canSeeAll = 
@@ -88,19 +102,10 @@ class PollManagementService {
             $membership->can_see_progress ||
             $membership->can_modify_poll;
 
+        $questions = [];
+
         if($canSeeAll) {
-            $lastSeqId = $poll->sequence_id;
-            $questions = $poll->questions->map(function($q) use($lastSeqId) { 
-                $q->revealed = $q->poll_sequence_id <= $lastSeqId;
-                return $q;
-            });
-            
-        }else{
-            $questions = PollStateService::getAccessibleQuestions($membership);
-            $questions = $questions->map(function($q) { 
-                $q->revealed = true;
-                return $q;
-            });
+            $questions = $poll->questions->all();
         }
         return QuestionResource::collection($questions);
     }
