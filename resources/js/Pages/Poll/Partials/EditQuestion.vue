@@ -10,6 +10,7 @@ import DangerButton from '@/Components/DangerButton.vue';
 import EditRange from './EditRange.vue';
 import VueCollapse from 'vue3-collapse';
 import CollapseChevron from '@/Components/CollapseChevron.vue';
+import { VueSpinnerDots } from 'vue3-spinners';
 
 const props = defineProps({
     question: {
@@ -142,6 +143,7 @@ const collapsed = ref(typeof questionDraft.uncommitted === "undefined" && !quest
                                 autofocus 
                             />
 
+                            <VueSpinnerDots class="spinner" />
                             <CollapseChevron v-model:collapsed="collapsed"/>
 
                         </div>
