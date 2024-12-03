@@ -81,7 +81,14 @@ onMounted(()=>{
 });
 
 
-watch(questionDraft, changed);
+watch(questionDraft, (newQuestion)=>{
+
+    if(newQuestion.justStored) {
+        return;
+    }
+
+    changed();
+});
 watch(responseType, ()=>{
     let params = paramsForTypes.value[responseType.value];
     questionDraft.response_params = params;

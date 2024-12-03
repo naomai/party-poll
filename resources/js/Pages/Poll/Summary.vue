@@ -47,7 +47,7 @@ const clientState = reactive({
 })
 
 const createQuestion = () => {
-    let newQuestion = {uncommitted: Math.random()};
+    let newQuestion = {uncommitted: true, localUniqueId: Math.random()};
     questionsAll.push(newQuestion);
 }
 
@@ -91,8 +91,12 @@ const updateQuestion = (question) => {
 const deleteQuestion = (q) => {
 
     const deleteFromLocalList = (q) => {
-        let questionInArray = questions.find((question)=>question.id == q.id && question.uncommitted == q.uncommitted);
-        questions.splice(questions.indexOf(questionInArray), 1);
+        let questionInArray = questionsAll.find(
+            (question)=>
+                (typeof q.id!="undefined" && question.id == q.id) 
+                || (typeof q.localUniqueId!="undefined" && question.localUniqueId == q.localUniqueId)
+        );
+        questionsAll.splice(questionsAll.indexOf(questionInArray), 1);
     }
 
     if(typeof q.uncommitted != 'undefined' ) {
@@ -162,7 +166,7 @@ const publishWarning = ref(null); //useTemplateRef('publishWarning');
                             :client-state="clientState"
                             @update:question="updateQuestion"
                             @delete="deleteQuestion"
-                            :key="question.id || question.uncommitted"
+                            :key="question.localUniqueId || question.id"
                         />
                     </ul>
                         <div v-if="hasMoreQuestions && !page.props.state.waiting_me && page.props.state.waiting_others && !clientState.editing" class="text-gray-400 text-center px-6 py-6 w-full">
