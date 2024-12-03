@@ -51,7 +51,8 @@ const createQuestion = () => {
     questionsAll.push(newQuestion);
 }
 
-const updateQuestion = (question) => {
+const updateQuestion = (request) => {
+    let question = request.data;
     let q = {
         id: question.id,
         uncommitted: question.uncommitted,
@@ -73,8 +74,9 @@ const updateQuestion = (question) => {
             question.poll_sequence_id = response.data.poll_sequence_id;
             question.justStored = true;
             delete question.uncommitted;
+            request.busyFlag.value = false;
         }).catch(()=>{
-
+            request.busyFlag.value = false;
         });
     } else {
         axios.patch(
@@ -83,7 +85,11 @@ const updateQuestion = (question) => {
                 question: q.id,
             }), 
             q
-        ).then(()=>{});
+        ).then(()=>{
+            request.busyFlag.value = false;
+        }).catch(()=>{
+            request.busyFlag.value = false;
+        });
     }
 
 }

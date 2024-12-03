@@ -20,7 +20,7 @@ const props = defineProps({
     },
     clientState: {
         type: Object,
-    }
+    },
 });
 
 const allowEdit = computed(() => 
@@ -62,13 +62,19 @@ const paramsForTypes = ref({
 });
 
 const responseType = ref(props.question.type);
+const stateDeleting = ref(false);
+const stateProcessing = ref(false);
+
 
 const emit = defineEmits([
     'update:question', "delete"
 ]);
 
 const changed = debounce(() => {
-    emit("update:question", questionDraft);
+    emit("update:question", {
+        data: questionDraft, 
+        busyFlag: stateProcessing,
+    });
 }, 1000);
 
 
@@ -82,13 +88,14 @@ onMounted(()=>{
 
 
 watch(questionDraft, (newQuestion)=>{
-
     if(newQuestion.justStored) {
         return;
     }
+    stateProcessing.value = true;
 
     changed();
 });
+
 watch(responseType, ()=>{
     let params = paramsForTypes.value[responseType.value];
     questionDraft.response_params = params;
@@ -96,6 +103,7 @@ watch(responseType, ()=>{
 });
 
 const questionDelete = ()=>{
+    stateDeleting.value = true;
     emit("delete", questionDraft);
 };
 
@@ -106,11 +114,11 @@ const collapsed = ref(typeof questionDraft.uncommitted === "undefined" && !quest
 
 <template>
     <li         
-        :class="{collapsed: collapsed, 'edit-lock': !allowEdit}"
+        :class="{collapsed: collapsed, 'edit-lock': !allowEdit, 'processing': stateProcessing, 'deleting': stateDeleting}"
         @click="collapsed = false"
     >
         <div
-            class="question" 
+            class="question"
         >
             <form @submit.prevent="submitQuestionProperties">
                 
@@ -147,7 +155,7 @@ const collapsed = ref(typeof questionDraft.uncommitted === "undefined" && !quest
                             <EditSelect v-if="questionDraft.type=='select'" :question="questionDraft" @update:question="changed" />
                             <EditRange v-if="questionDraft.type=='range'" :question="questionDraft" @update:question="changed" />
                         </div>
-                        <DangerButton @click.stop="questionDelete" class="question-delete">Delete question</DangerButton>
+                        <DangerButton @click.stop="questionDelete" class="question-delete" :disabled="stateProcessing">Delete question</DangerButton>
                     </VueCollapse>
                 </div>
                 <div v-else class="editor">
