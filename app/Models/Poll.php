@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Services\MembershipService;
+use App\Services\PollManagementService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -25,6 +26,10 @@ class Poll extends Model {
     ];
 
     public static function booted(): void {
+        self::creating(function(Poll $poll){
+            $poll->access_link_token = PollManagementService::generateInvitationToken();
+        });
+
         self::created(function(Poll $poll){
             Model::unguard();
             Membership::create([
