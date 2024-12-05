@@ -25,6 +25,12 @@
 
 }
 
+html {
+    @media (max-width: 400px) { 
+        font-size: 0.75rem;
+    }
+}
+
 #app-backdrop {
     min-height: 100vh; 
     background-color: var(--app-backdrop); 
@@ -220,7 +226,7 @@ button {
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); 
 
     box-shadow: 0 2px 3px #0001; 
-    height: 42px;
+    height: 3rem;
 
     gap: 4px;
 

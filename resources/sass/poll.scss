@@ -9,6 +9,7 @@
     max-width: 50rem;
     margin-left: auto;
     margin-right: auto;
+
 }
 
 #poll-summary .poll-questions {
@@ -168,6 +169,11 @@
 
         }
 
+        .response-params-config .option-row {
+            display: flex;
+            align-items: baseline;
+        }
+
         .option-delete {
             --danger-color: #c13434;
             --danger-pale: #f9d5d5;
@@ -216,8 +222,8 @@
     align-items: flex-start;
     display: flex;
     .action {
-        width: 50px;
-        height: 50px;
+        width: 3em;
+        height: 3em;
         --tw-bg-opacity: 1;
         background-color: rgb(55 65 81 / var(--tw-bg-opacity));
         border-radius: 9999px;
@@ -247,3 +253,9 @@
         
     }
 } 
+
+
+#poll-summary .state-message {
+    height: 4em;
+
+}

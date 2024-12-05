@@ -154,7 +154,7 @@ const publishWarning = ref(null); //useTemplateRef('publishWarning');
                     class="poll-questions app-island"
                     :class="{editing: clientState.editing}"
                 >
-                    <div v-if="!hasQuestions" class="text-gray-400 text-center px-6 py-6 w-full">
+                    <div v-if="!hasQuestions" class="state-message">
                         {{ isAdmin ? "There are no questions here. Go ahead and add some!" : "We don't have any questions yet. Come back soon!" }}
                     </div>
                     <ul 
