@@ -11,6 +11,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 use Inertia\Testing\AssertableInertia as Assert;
+use Tests\Feature\Helpers;
 
 class PollTest extends TestCase {
     //use RefreshDatabase;
@@ -49,7 +50,7 @@ class PollTest extends TestCase {
     }
 
     public function test_edit_poll(): void {
-        [$poll, $user] = $this->_createPollWithAdmin();
+        [$poll, $user] = Helpers::createPollWithAdmin();
 
         $newProperties = [
             'title'=>fake()->sentence(),
@@ -66,7 +67,7 @@ class PollTest extends TestCase {
     }
 
     public function test_view_poll(): void {
-        [$poll, $user] = $this->_createPollWithAdmin();
+        [$poll, $user] = Helpers::createPollWithAdmin();
 
         $this->actingAs($user)
             ->get(route('polls.show', $poll->id))
@@ -91,7 +92,7 @@ class PollTest extends TestCase {
     }
 
     public function test_get_invitation_link(): void {
-        [$pollWithInvite, $user] = $this->_createPollWithAdmin([
+        [$pollWithInvite, $user] = Helpers::createPollWithAdmin([
             'enable_link_invite' => true,
         ]);
         $invitationToken = $pollWithInvite->access_link_token;
@@ -108,9 +109,8 @@ class PollTest extends TestCase {
         );
 
 
-        [$pollNoInvite] = $this->_createPollWithAdmin([
-            'enable_link_invite' => false, 
-            'owner_id'=>$user->id
+        $pollNoInvite = Helpers::createPollFor($user, [
+            'enable_link_invite' => false
         ]);
         $this->actingAs($user)
             ->get(route('polls.show', $pollNoInvite->id))
@@ -124,7 +124,7 @@ class PollTest extends TestCase {
     // --
 
     public function test_new_poll_has_valid_properties(): void {
-        [$poll, $user] = $this->_createPollWithAdmin(['enable_link_invite'=>true]);
+        [$poll, $user] = Helpers::createPollWithAdmin(['enable_link_invite'=>true]);
 
         $this->assertNull($poll->sequence_id);
         $this->assertNull($poll->published_sequence_id);
@@ -137,21 +137,9 @@ class PollTest extends TestCase {
     }
 
     public function test_owner_has_membership(): void {
-        [$poll, $user] = $this->_createPollWithAdmin();
+        [$poll, $user] = Helpers::createPollWithAdmin();
 
         $this->assertTrue($poll->hasMember($user), "poll owner is a member of poll");
-    }
-
-    private function _createPollWithAdmin(array $props=[]): array {
-        if(isset($props['owner_id'])){
-            $userId = $props['owner_id'];
-            $user = User::find($userId);
-        } else{
-            $user = User::factory()->create();
-        }
-        $poll = Poll::factory()->create([...$props, 'owner_id'=>$user->id]);
-        
-        return [$poll, $user];
     }
 
 }
