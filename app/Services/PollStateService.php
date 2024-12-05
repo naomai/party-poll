@@ -161,15 +161,16 @@ class PollStateService {
      * published questions.
      * 
      * @return ?Question next question in sequence, or null if already reached
-     *   last published question
+     *   last published question (also if poll is yet to be started)
      */
     public static function getNextQuestion(Poll $poll): ?Question {
         $nextQuestion = null;
         $waitForAll = $poll->wait_for_everybody;
         $sequenceId = $poll->sequence_id;
         $sequenceIdPub = $poll->published_sequence_id;
+
         if($sequenceId === null) {
-            $sequenceId = 0;
+            return null;
         }
 
         if($waitForAll) {
