@@ -27,7 +27,7 @@ class InvitationController extends Controller {
         if(!$allowJoining) {
             return Inertia::render("Invite/Denied", [
                 'poll'=>$poll,
-            ]);
+            ])->toResponse($request)->setStatusCode(403);
         }
 
         // save invitation token and redirect to guest account creation
