@@ -82,18 +82,23 @@ class PollTest extends TestCase {
                     )
                     ->has('links')
                     ->has('rules')
+                    ->has('question_count')
+                    ->has('member_count')
+                    ->etc()
                 )
             );
         
     }
 
     public function test_get_invitation_link(): void {
-        [$poll, $user] = $this->_createPollWithAdmin();
+        [$pollWithInvite, $user] = $this->_createPollWithAdmin([
+            'enable_link_invite' => true,
+        ]);
+        $invitationToken = $pollWithInvite->access_link_token;
 
-        $invitationToken = $poll->access_link_token;
-
+        $this->assertStringStartsWith("lorem-ipsum-", $invitationToken);
         $this->actingAs($user)
-            ->get(route('polls.show', $poll->id))
+            ->get(route('polls.show', $pollWithInvite->id))
             ->assertStatus(200)
             ->assertInertia(fn (Assert $page) => $page
                 ->component('Poll/Summary')
@@ -101,12 +106,25 @@ class PollTest extends TestCase {
                     strpos($url, $invitationToken) !== false
                 )
         );
+
+
+        [$pollNoInvite] = $this->_createPollWithAdmin([
+            'enable_link_invite' => false, 
+            'owner_id'=>$user->id
+        ]);
+        $this->actingAs($user)
+            ->get(route('polls.show', $pollNoInvite->id))
+            ->assertStatus(200)
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Poll/Summary')
+                ->where('info.links.invite', null)
+        );
     }
 
     // --
 
     public function test_new_poll_has_valid_properties(): void {
-        [$poll, $user] = $this->_createPollWithAdmin();
+        [$poll, $user] = $this->_createPollWithAdmin(['enable_link_invite'=>true]);
 
         $this->assertNull($poll->sequence_id);
         $this->assertNull($poll->published_sequence_id);
@@ -124,9 +142,14 @@ class PollTest extends TestCase {
         $this->assertTrue($poll->hasMember($user), "poll owner is a member of poll");
     }
 
-    private function _createPollWithAdmin(): array {
-        $user = User::factory()->create();
-        $poll = Poll::factory()->create(['owner_id'=>$user->id]);
+    private function _createPollWithAdmin(array $props=[]): array {
+        if(isset($props['owner_id'])){
+            $userId = $props['owner_id'];
+            $user = User::find($userId);
+        } else{
+            $user = User::factory()->create();
+        }
+        $poll = Poll::factory()->create([...$props, 'owner_id'=>$user->id]);
         
         return [$poll, $user];
     }
