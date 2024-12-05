@@ -33,14 +33,6 @@ class PollTest extends TestCase {
                 ->has('polls', $pollCount)
             );
     }
-
-    public function test_owner_has_membership(): void {
-        $user = User::factory()->create();
-        $poll = Poll::factory()->create(['owner_id'=>$user->id]);
-
-        $this->assertTrue($poll->hasMember($user), "poll owner is a member of poll");
-    }
-
     public function test_create_poll(): void {
         $user = User::factory()->create();
         
@@ -57,8 +49,7 @@ class PollTest extends TestCase {
     }
 
     public function test_edit_poll(): void {
-        $user = User::factory()->create();
-        $poll = Poll::factory()->create(['owner_id'=>$user->id]);
+        [$poll, $user] = $this->_createPollWithAdmin();
 
         $newProperties = [
             'title'=>fake()->sentence(),
@@ -74,6 +65,70 @@ class PollTest extends TestCase {
         $this->assertEquals($newProperties['wait_for_everybody'], $poll->wait_for_everybody);
     }
 
+    public function test_view_poll(): void {
+        [$poll, $user] = $this->_createPollWithAdmin();
 
+        $this->actingAs($user)
+            ->get(route('polls.show', $poll->id))
+            ->assertStatus(200)
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Poll/Summary')
+                ->has('info', fn (Assert $page) => $page
+                    ->where('id', $poll->id)
+                    ->where('title', $poll->title)
+                    ->has('owner', fn (Assert $page) => $page
+                        ->where('id', $user->id)
+                        ->has('name')
+                    )
+                    ->has('links')
+                    ->has('rules')
+                )
+            );
+        
+    }
+
+    public function test_get_invitation_link(): void {
+        [$poll, $user] = $this->_createPollWithAdmin();
+
+        $invitationToken = $poll->access_link_token;
+
+        $this->actingAs($user)
+            ->get(route('polls.show', $poll->id))
+            ->assertStatus(200)
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Poll/Summary')
+                ->where('info.links.invite', fn (string $url) =>
+                    strpos($url, $invitationToken) !== false
+                )
+        );
+    }
+
+    // --
+
+    public function test_new_poll_has_valid_properties(): void {
+        [$poll, $user] = $this->_createPollWithAdmin();
+
+        $this->assertNull($poll->sequence_id);
+        $this->assertNull($poll->published_sequence_id);
+
+        $this->assertIsString($poll->access_link_token, "has invite token string");
+        $this->assertStringContainsString(
+            "lorem-ipsum-", $poll->access_link_token, 
+            "has valid invite token"
+        );
+    }
+
+    public function test_owner_has_membership(): void {
+        [$poll, $user] = $this->_createPollWithAdmin();
+
+        $this->assertTrue($poll->hasMember($user), "poll owner is a member of poll");
+    }
+
+    private function _createPollWithAdmin(): array {
+        $user = User::factory()->create();
+        $poll = Poll::factory()->create(['owner_id'=>$user->id]);
+        
+        return [$poll, $user];
+    }
 
 }
