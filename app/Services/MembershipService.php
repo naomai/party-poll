@@ -30,7 +30,7 @@ class MembershipService {
     /** getMembership
      * Get membership object tying User to a Poll
      */
-    public static function getMembership(Poll $poll, User $user): Membership {
+    public static function getMembership(Poll $poll, User $user): ?Membership {
         /*return Membership::where([
             ['poll_id', '=', $poll->id],
             ['user_id', '=', $user->id],
