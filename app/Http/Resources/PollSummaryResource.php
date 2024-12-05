@@ -43,7 +43,7 @@ class PollSummaryResource extends PollBasicInfoResource {
         return route("api.poll.state", $this->id);
     }
 
-    public function getUrlInvitation(): string {
+    public function getUrlInvitation(): ?string {
         if(!$this->enable_link_invite) {
             return null;
         }
