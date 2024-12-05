@@ -33,7 +33,7 @@ const canSeeAllQuestions = computed(() =>
 );
 
 const hasUnpublished = computed(()=>
-    questions.reduce((a, current)=>
+    questionsAll.reduce((a, current)=>
         a ||
         page.props.state.poll_state.published_seq === null ||
         page.props.state.poll_state.published_seq < current.poll_sequence_id
@@ -122,7 +122,7 @@ const deleteQuestion = (q) => {
 
 const publishQuestions = () => {
     router.post(route("polls.publish", {poll: info.id}), {}, {
-        only: ['info', 'state'], 
+        only: ['info', 'state', 'questions', 'questionsAll'], 
         preserveState: true,
         preserveScroll: true,
     });
@@ -175,10 +175,10 @@ const publishWarning = ref(null); //useTemplateRef('publishWarning');
                             :key="question.localUniqueId || question.id"
                         />
                     </ul>
-                        <div v-if="hasMoreQuestions && !page.props.state.waiting_me && page.props.state.waiting_others && !clientState.editing" class="text-gray-400 text-center px-6 py-6 w-full">
+                        <div v-if="hasMoreQuestions && !page.props.state.waiting_me && page.props.state.waiting_others && !clientState.editing" class="state-message">
                             Waiting for others... ({{ page.props.state.others_responses_left }})
                         </div>
-                    <div v-if="hasQuestions && !hasMoreQuestions && !page.props.state.waiting_me && !clientState.editing" class="text-gray-400 text-center px-6 py-6 w-full">
+                    <div v-if="hasQuestions && !hasMoreQuestions && !page.props.state.waiting_me && !clientState.editing" class="state-message">
                         No more questions for you. Come back soon!
                     </div>
                     <div v-if="isAdmin && clientState.editing" class="edit-buttons self-center py-6">
@@ -189,7 +189,7 @@ const publishWarning = ref(null); //useTemplateRef('publishWarning');
                 </div>
             </div>
         </div>
-    <pre v-if="false">
+    <pre v-if="true">
         {{ page.props }}
     </pre>
     <Modal :show="clientState.viewingQr" @close="clientState.viewingQr = false">

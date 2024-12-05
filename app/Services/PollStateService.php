@@ -28,15 +28,18 @@ class PollStateService {
             $othersResponsesLeft = $poll->memberships->count() - $currentQuestion->answers->count();
         }
 
+        $started = $pollState['started'];
+
         return [
-            'waiting_start' => !$pollState['started'],
-            'waiting_me' => $currentQuestionId !== null,
-            'waiting_others' => $pollState['blocking'],
+            'waiting_start' => !$started,
+            'waiting_me' => $started && $pollState['more_questions'] && $currentQuestionId !== null,
+            'waiting_others' => $started && $pollState['blocking'],
             'more_questions' => $pollState['more_questions'],
             'question_id' => $currentQuestionId,
             'blocking_id' => $pollState['blocking_id'],
             'others_responses_left' => $othersResponsesLeft,
             'poll_state' => $pollState,
+            //'finished' => $started && !$pollState['more_questions'] && $currentQuestion===null,
         ];
     }
 
@@ -185,7 +188,8 @@ class PollStateService {
     /** getCurrentQuestion
      * Get unanswered/blocking question for the member
      * This question is either waiting for response from member, or blocking 
-     * while waiting for others.
+     * while waiting for others. Returns null if poll is not started, or
+     * member answered all the questions.
      */
     public static function getCurrentQuestion(Membership $membership): ?Question {
         $question = static::getAccessibleQuestions($membership)->last();
@@ -255,12 +259,15 @@ class PollStateService {
             );
 
             if($firstWithoutAnswer!==null) {
+                // there is an unanswered question
                 $sequenceId = $firstWithoutAnswer['question']->poll_sequence_id;
+            }else{
+                // all questions answered
+                $sequenceId = 999999;
             }
         }
-
         if($sequenceId === null) {
-            return collect();
+            return collect([]);
         }
 
         return $questions->where('poll_sequence_id', '<=', $sequenceId)->get();

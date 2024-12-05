@@ -31,13 +31,13 @@ watch(optionsLocal, (o)=>{
 </script>
 
 <template>
-    <div v-for="(option, index) in optionsLocal">
+    <div v-for="(option, index) in optionsLocal" class="option-row">
         
         <IconTextInput v-model="option.caption" class="option full-width" icon="pizza-slice" :autofocus="option.newOption" />
         <button :disabled="optionsLocal.length <= 1" class="option-delete" @click="deleteOption(index)"><i class="fa icon fa-trash"></i></button>
     </div>
 
-    <div>
+    <div class="option-row">
         <IconTextInput 
             class="option full-width" icon="pizza-slice" 
             placeholder="Add..."

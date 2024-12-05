@@ -38,6 +38,8 @@ const submit = () => {
     form.put(
         route('question.answer.store', props.question.id), {
         onFinish: () => {},
+        only: ['info', 'state', 'questions'], 
+        preserveState: false,
         preserveScroll: true,
     });
 };
