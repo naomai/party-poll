@@ -50,6 +50,23 @@ class InvitationTest extends TestCase
         ;
     }
 
+    public function test_redirect_anonymous_to_name_creation(): void {
+        [$poll, $user] = Helpers::createPollWithAdmin([
+            'enable_link_invite' => true,
+        ]);
+        $invitationToken = $poll->access_link_token;
+
+        $this
+            ->get(route('invite.view', [
+                'poll'=>$poll->id, 
+                'accesskey'=>$invitationToken,
+            ]))
+            ->assertRedirectToRoute('index')
+        ;
+    }
+
+    // --
+
     private function _prepareInvitationConditions(): array {
         [$poll, $user] = Helpers::createPollWithAdmin([
             'enable_link_invite' => true,
