@@ -2,6 +2,7 @@
 import Checkbox from '@/Components/Checkbox.vue';
 import Radio from '@/Components/Radio.vue';
 import { computed, getCurrentInstance, reactive, ref } from 'vue';
+import QuestionOption from './QuestionOption.vue';
 
 const model = defineModel()
 
@@ -52,6 +53,10 @@ const optionChanged = (id, value) => {
 </script>
 
 <template>
+    <QuestionOption v-for="(option, index) in options" 
+        :option="option" :index="index" :form_id="id"
+        :multi-select="multiSelect"
+    />
     <div v-for="(option, index) in options">
         <Radio v-if="!multiSelect"
             :value="index" 
