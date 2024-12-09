@@ -21,9 +21,13 @@ const questions = reactive(page.props.questions);
 const questionsAll = reactive(page.props.questions_privileged);
 const membership = page.props.membership;
 
-const hasQuestions = computed(() =>
+const hasQuestionsToAnswer = computed(() =>
     questions.length > 0
 );
+const hasQuestionsToEdit = computed(() =>
+    questionsAll.length > 0
+);
+
 
 const hasMoreQuestions = ref(page.props.state.more_questions);
 
@@ -154,41 +158,44 @@ const publishWarning = ref(null); //useTemplateRef('publishWarning');
                     class="poll-questions app-island"
                     :class="{editing: clientState.editing}"
                 >
-                    <div v-if="!hasQuestions" class="state-message">
-                        {{ isAdmin ? "There are no questions here. Go ahead and add some!" : "We don't have any questions yet. Come back soon!" }}
-                    </div>
-                    <ul 
-                        v-if="hasQuestions" 
-                        role="list" class="question-list"
-                    >
-                        <Question v-if="!clientState.editing"
-                            v-for="question in questions" 
-                            :question="question" :poll-state="page.props.state"
-                            :client-state="clientState"
-                        />
-                        <EditQuestion v-else
-                            v-for="question in questionsAll" 
-                            :question="question" :poll-state="page.props.state"
-                            :client-state="clientState"
-                            @update:question="updateQuestion"
-                            @delete="deleteQuestion"
-                            :key="question.localUniqueId || question.id"
-                        />
-                    </ul>
-                        <div v-if="hasMoreQuestions && !page.props.state.waiting_me && page.props.state.waiting_others && !clientState.editing" class="state-message">
-                            Waiting for others... ({{ page.props.state.others_responses_left }})
-                        </div>
-                    <div v-if="hasQuestions && !hasMoreQuestions && !page.props.state.waiting_me && !clientState.editing" class="state-message">
-                        No more questions for you. Come back soon!
-                    </div>
-                    <div v-if="isAdmin && clientState.editing" class="edit-buttons self-center py-6">
-                        <ListAddButton class="" @click="createQuestion()">New question</ListAddButton>
-                        <SecondaryButton v-if="hasUnpublished" @click="publishWarning.show()"><i class="fa-solid fa-person-chalkboard"></i> Reveal</SecondaryButton>
-                    </div>
-                    <InlineWarning class="publish-warning" ref='publishWarning' @confirm="publishQuestions">Reveal questions? You won't be able to edit them.</InlineWarning>
+                <ul
+                role="list" class="question-list"
+                >
+                    <Question v-if="!clientState.editing"
+                        v-for="question in questions" 
+                        :question="question" :poll-state="page.props.state"
+                        :client-state="clientState"
+                    />
+                    <EditQuestion v-else
+                        v-for="question in questionsAll" 
+                        :question="question" :poll-state="page.props.state"
+                        :client-state="clientState"
+                        @update:question="updateQuestion"
+                        @delete="deleteQuestion"
+                        :key="question.localUniqueId || question.id"
+                    />
+                </ul>
+
+                <div v-if="hasMoreQuestions && !page.props.state.waiting_me && page.props.state.waiting_others" class="state-message">
+                    Waiting for others... ({{ page.props.state.others_responses_left }})
                 </div>
+                <div v-else-if="!hasQuestionsToEdit && isAdmin" class="state-message">
+                    Hey boss, there are no questions here. Go ahead and add some!
+                </div>
+                <div v-else-if="!hasQuestionsToAnswer" class="state-message">
+                    We don't have any questions yet. Come back soon!
+                </div>
+                <div v-else-if="hasQuestionsToAnswer && !hasMoreQuestions && page.props.state.question_id===null && !page.props.state.waiting_me" class="state-message">
+                    No more questions for you. Come back soon!
+                </div>
+                <div v-if="isAdmin && clientState.editing" class="edit-buttons self-center py-6">
+                    <ListAddButton class="" @click="createQuestion()">New question</ListAddButton>
+                    <SecondaryButton v-if="hasUnpublished" @click="publishWarning.show()"><i class="fa-solid fa-person-chalkboard"></i> Reveal</SecondaryButton>
+                </div>
+                <InlineWarning class="publish-warning" ref='publishWarning' @confirm="publishQuestions">Reveal questions? You won't be able to edit them.</InlineWarning>
             </div>
         </div>
+    </div>
     <pre v-if="true">
         {{ page.props }}
     </pre>
