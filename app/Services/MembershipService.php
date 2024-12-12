@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use App\Enums\InvitationStatus;
 use App\Models\Membership;
 use App\Models\Poll;
 use App\Models\User;
@@ -71,13 +72,21 @@ class MembershipService {
         return $actions;
     }
 
-    public function checkInvitation(Poll $poll, ?string $token) : bool {
+    public function checkInvitation(Poll $poll, ?string $token) : InvitationStatus {
         $tokenMatch = $token !== null && $token == $poll->access_link_token;
+
+        if(!$tokenMatch || !$poll->enable_link_invite) {
+            return InvitationStatus::Invalid;
+        }
 
         $isPollStarted = $poll->sequence_id !== null;
         $startGuard = $poll->close_after_start && $isPollStarted;
 
-        return $poll->enable_link_invite && !$startGuard && $tokenMatch;
+        if($startGuard) {
+            return InvitationStatus::Expired;
+        }
+
+        return InvitationStatus::Valid;
     }
 
     public const BLUEPRINT_USER = [
@@ -95,3 +104,4 @@ class MembershipService {
     ];
 
 }
+

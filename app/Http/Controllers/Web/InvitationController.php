@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Enums\InvitationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Membership;
 use App\Models\Poll;
@@ -21,14 +22,22 @@ class InvitationController extends Controller {
 
         $token = $request->query("accesskey");
 
-        $allowJoining = $svc->checkInvitation($poll, $token);
+        $invitationStatus = $svc->checkInvitation($poll, $token);
 
-        // invalid token / poll does not accept invitations
-        if(!$allowJoining) {
+        
+        if($invitationStatus == InvitationStatus::Invalid) {
+            // invalid token / poll does not accept invitations
             return Inertia::render("Invite/Denied", [
-                'poll'=>$poll,
+                'status' => $invitationStatus,
             ])->toResponse($request)->setStatusCode(403);
-        }
+            
+        } elseif($invitationStatus == InvitationStatus::Expired) {
+            // expired - poll has started
+            return Inertia::render("Invite/Denied", [
+                'status' => $invitationStatus,
+                'poll' => $poll,
+            ])->toResponse($request)->setStatusCode(410);
+        } 
 
         // save invitation token and redirect to guest account creation
         if(!Auth::check()) {

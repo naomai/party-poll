@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Enums\InvitationStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PollBasicInfoResource;
 use App\Models\Poll;
@@ -24,8 +25,8 @@ class OnboardingController extends Controller {
             $pollId = session()->get('invite_poll');
             $poll = Poll::find($pollId);
             
-            $validInvitation = $svc->checkInvitation($poll, $token);
-            if($validInvitation) {
+            $invitationStatus = $svc->checkInvitation($poll, $token);
+            if($invitationStatus == InvitationStatus::Valid) {
                 $invitation = [
                     'poll' => new PollBasicInfoResource($poll),
                 ];
