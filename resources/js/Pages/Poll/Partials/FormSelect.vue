@@ -1,6 +1,4 @@
 <script setup>
-import Checkbox from '@/Components/Checkbox.vue';
-import Radio from '@/Components/Radio.vue';
 import { computed, getCurrentInstance, reactive, ref } from 'vue';
 import QuestionOption from './QuestionOption.vue';
 
@@ -9,6 +7,12 @@ const model = defineModel()
 const props = defineProps({
     responseParams: {
         type: Object,
+    },
+    stats: {
+        type: Object,
+    },
+    locked: {
+        type: Boolean,
     },
 });
 
@@ -27,6 +31,11 @@ const wrapAnswer = (x) => {
 };
 
 const optionChanged = (id, value) => {
+    if(!multiSelect) {
+        model.value = wrapAnswer([id]);
+        return;
+    }
+
     const sel = selectionQueue.value;
     if(value) {
         sel.push(id);
@@ -53,25 +62,16 @@ const optionChanged = (id, value) => {
 </script>
 
 <template>
+
     <QuestionOption v-for="(option, index) in options" 
         :option="option" :index="index" :form_id="id"
         :multi-select="multiSelect"
+        :votes="stats.options[index][1]"
+        :max-votes="stats.votes"
+        :selected="model!==null && model.selected.indexOf(index)!==-1"
+        :locked="locked"
+        @changed="($idx,$value)=>optionChanged($idx,$value)"
     />
-    <div v-for="(option, index) in options">
-        <Radio v-if="!multiSelect"
-            :value="index" 
-            :id="'rdb-'+id+'-'+index"
-            :group="id"
-            class="rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            @update:selected-id="($val)=>{selection=[$val]; model=wrapAnswer(selection);}" />
-        <Checkbox v-if="multiSelect" 
-            :value="index"
-            :id="'rdb-'+id+'-'+index"
-            :checked="option.checked"
-            @update:checked="($val)=>{optionChanged(index, $val)}"
-            />
-        <label :for="'rdb-'+id+'-'+index" class='pl-3 text-sm text-gray-900'>{{ option.caption }}</label>
-    </div>
     <div v-if="multiSelect && selectedMax != 0"
         class="text-sm text-gray-500"
     >

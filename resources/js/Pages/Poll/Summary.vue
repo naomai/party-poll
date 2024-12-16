@@ -17,7 +17,7 @@ import InlineWarning from '@/Components/InlineWarning.vue';
 
 const page = usePage();
 const info = page.props.info;
-const questions = reactive(page.props.questions);
+const questions = computed(()=>page.props.questions);
 const questionsAll = reactive(page.props.questions_privileged);
 const membership = page.props.membership;
 
@@ -165,6 +165,7 @@ const publishWarning = ref(null); //useTemplateRef('publishWarning');
                         v-for="question in questions" 
                         :question="question" :poll-state="page.props.state"
                         :client-state="clientState"
+                        :rules="page.props.info.rules"
                     />
                     <EditQuestion v-else
                         v-for="question in questionsAll" 

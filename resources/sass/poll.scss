@@ -90,6 +90,48 @@
             }
         }
 
+        .question .response-editor .option {
+            --option-bg: oklch(from var(--app-island-bg) calc(l + 0.1) calc(c - 0.0) h);;
+            --option-bar-bg: oklch(from var(--app-island-bg) calc(l + 0.2) calc(c - 0.0) h);;
+
+            position: relative;
+            border: 1px solid var(--option-bg);
+            background: var(--option-bg);
+            border-radius: 0.5em;
+
+            height: 2.5em;
+            overflow: hidden;
+            
+            margin-bottom: 0.5em;          
+            
+            .controls {
+                position: absolute;
+                top: 0;
+                left: 0;
+                display: flex;
+                gap: 0.3em;
+                justify-content: space-between;
+                align-items: center;
+
+                padding: 0.3em 0.7em;
+                
+                label {
+                    width: 100%;
+                }
+                z-index: 1;
+            }
+
+            .chart-bar {
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                background-color: var(--option-bar-bg);
+                z-index: 0;
+                transition: width 0.5s ease-in;
+            }
+        }
+
         &.processing .collapse-chevron {
             display: none;
         }

@@ -30,6 +30,8 @@ class QuestionService {
         $stats = ['options'=>[]];
         $answers = $question->answers->all();
 
+        $stats['votes'] = count($answers);
+
         switch($question->type) {
             case "text":
                 $stats['type'] = 'list';

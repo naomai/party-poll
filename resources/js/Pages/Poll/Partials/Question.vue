@@ -18,6 +18,9 @@ const props = defineProps({
     },
     clientState: {
         type: Object,
+    },
+    rules: {
+        type: Object,
     }
 });
 
@@ -39,7 +42,7 @@ const submit = () => {
         route('question.answer.store', props.question.id), {
         onFinish: () => {},
         only: ['info', 'state', 'questions'], 
-        preserveState: false,
+        preserveState: true,
         preserveScroll: true,
     });
 };
@@ -83,12 +86,17 @@ const submit = () => {
                     class="response-editor"
                     @click.stop=""
                 >
-                    <form v-if="question.answer==null && question.revealed"
+                    <form v-if="question.revealed"
                         @submit.prevent="submit"
                     >
                         <FormRange v-if="question.type=='range'" :response-params="question.response_params" v-model="responseLocal"/>
                         <FormInput v-if="question.type=='input'" :response-params="question.response_params" v-model="responseLocal"/>
-                        <FormSelect v-if="question.type=='select'" :response-params="question.response_params" v-model="responseLocal"/>
+                        <FormSelect v-if="question.type=='select'" 
+                            :response-params="question.response_params" 
+                            v-model="responseLocal"
+                            :stats="question.stats"
+                            :locked="!rules.enable_revise_response && props.question.answer !== null"
+                        />
                         <FormRating v-if="question.type=='rating'" :response-params="question.response_params" v-model="responseLocal"/>
                         <div>
                             <PrimaryButton
@@ -99,13 +107,6 @@ const submit = () => {
                             </PrimaryButton>
                         </div>
                     </form>
-                    <div v-else-if="question.stats!==null"
-                        class="response-stats"
-                    >
-                        <StatsChart v-if="question.stats.type=='options'" :stats="question.stats" />
-                        <StatsText v-if="question.stats.type=='list'" :stats="question.stats" />
-
-                    </div>
                 </div>
             </VueCollapse>
         </div>
