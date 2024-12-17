@@ -66,7 +66,7 @@ const optionChanged = (id, value) => {
     <QuestionOption v-for="(option, index) in options" 
         :option="option" :index="index" :form_id="id"
         :multi-select="multiSelect"
-        :votes="stats.options[index][1]"
+        :votes="stats.options[index]"
         :max-votes="stats.votes"
         :selected="model!==null && model.selected.indexOf(index)!==-1"
         :locked="locked"

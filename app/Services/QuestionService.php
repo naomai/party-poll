@@ -49,10 +49,7 @@ class QuestionService {
                 $options = $question->response_params->options;
                 
                 // create template for options array - [text, votecount]
-                $optionsStatsEmpty = array_map(
-                    fn($o) => [$o->caption, 0], 
-                    $options
-                );
+                $optionsStatsEmpty = array_fill(0, count($options), 0);
                 
                 // lay selections (checkboxes selected) by all users in one flat array
                 $allSelections = array_reduce(
@@ -65,7 +62,7 @@ class QuestionService {
                 $stats['options'] = array_reduce(
                     $allSelections, 
                     function($stat, $item) {
-                        $stat[$item][1]++;
+                        $stat[$item]++;
                         return $stat;
                     },
                     $optionsStatsEmpty
