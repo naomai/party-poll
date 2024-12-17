@@ -62,7 +62,6 @@ const optionChanged = (id, value) => {
 </script>
 
 <template>
-
     <QuestionOption v-for="(option, index) in options" 
         :option="option" :index="index" :form_id="id"
         :multi-select="multiSelect"

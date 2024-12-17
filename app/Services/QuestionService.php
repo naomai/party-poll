@@ -58,7 +58,7 @@ class QuestionService {
                     []
                 );
                 
-                // fill options array
+                // create histogram of all selections
                 $stats['options'] = array_reduce(
                     $allSelections, 
                     function($stat, $item) {

@@ -2,7 +2,7 @@
 import ListAddButton from '@/Components/ListAddButton.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, router, usePage } from '@inertiajs/vue3';
-import { computed, onMounted, reactive } from 'vue';
+import { computed, onMounted, onUpdated, reactive } from 'vue';
 import PollPropertiesForm from '../PollManagement/PollPropertiesForm.vue';
 import Modal from '@/Components/Modal.vue';
 import { ref } from 'vue';
@@ -17,7 +17,7 @@ import InlineWarning from '@/Components/InlineWarning.vue';
 
 const page = usePage();
 const info = page.props.info;
-const questions = computed(()=>page.props.questions);
+const questions = reactive(page.props.questions);
 const questionsAll = reactive(page.props.questions_privileged);
 const membership = page.props.membership;
 
@@ -27,6 +27,10 @@ const hasQuestionsToAnswer = computed(() =>
 const hasQuestionsToEdit = computed(() =>
     questionsAll.length > 0
 );
+
+onUpdated(()=>{
+    questions.value = page.props.questions;
+});
 
 
 const hasMoreQuestions = ref(page.props.state.more_questions);
@@ -137,8 +141,13 @@ const publishWarning = ref(null); //useTemplateRef('publishWarning');
 //onMounted(()=>{
 window.Echo.private('PollVoteStats.'+info.id)
     .listen('.question.stats', (e) => {
-        console.log(e)
-        // hello world in console 
+        if(typeof e.question_id == 'number' && typeof e.stats == 'object') {
+            let questionId = e.question_id;
+
+            let question = questions.find((q) => q.id==questionId);
+            question.stats = e.stats;
+            
+        }
     })
 //});
 
