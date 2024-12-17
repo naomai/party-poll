@@ -2,7 +2,7 @@
 import ListAddButton from '@/Components/ListAddButton.vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, router, usePage } from '@inertiajs/vue3';
-import { computed, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 import PollPropertiesForm from '../PollManagement/PollPropertiesForm.vue';
 import Modal from '@/Components/Modal.vue';
 import { ref } from 'vue';
@@ -133,6 +133,14 @@ const publishQuestions = () => {
 };
 
 const publishWarning = ref(null); //useTemplateRef('publishWarning');
+
+//onMounted(()=>{
+window.Echo.private('PollVoteStats.'+info.id)
+    .listen('.question.stats', (e) => {
+        console.log(e)
+        // hello world in console 
+    })
+//});
 
 </script>
 

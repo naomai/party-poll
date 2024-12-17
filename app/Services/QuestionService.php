@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use App\Events\QuestionStatsUpdateEvent;
 use App\Models\Answer;
 use App\Models\Question;
 use Illuminate\Http\Request;
@@ -24,6 +25,8 @@ class QuestionService {
             uniqueBy: ['question_id', 'user_id'], 
             update: ['response']
         );
+
+        QuestionStatsUpdateEvent::dispatch($question);
     }
 
     public static function getQuestionStats(Question $question): array {
