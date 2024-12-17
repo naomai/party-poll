@@ -36,7 +36,7 @@ class QuestionStatsUpdateEvent implements ShouldBroadcast, ShouldDispatchAfterCo
      */
     public function broadcastOn(): array {
         return [
-            new PrivateChannel('PollVoteStats.'.$this->question->poll->id),
+            new PrivateChannel('Poll.'.$this->question->poll->id),
         ];
     }
 

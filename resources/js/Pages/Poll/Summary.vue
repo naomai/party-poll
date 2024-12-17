@@ -139,7 +139,7 @@ const publishQuestions = () => {
 const publishWarning = ref(null); //useTemplateRef('publishWarning');
 
 //onMounted(()=>{
-window.Echo.private('PollVoteStats.'+info.id)
+window.Echo.private('Poll.'+info.id)
     .listen('.question.stats', (e) => {
         if(typeof e.question_id == 'number' && typeof e.stats == 'object') {
             let questionId = e.question_id;
