@@ -221,14 +221,14 @@
             --danger-pale: #f9d5d5;
 
 
-            padding: 3px;
+            padding: 0.6rem;
             border: 1px solid var(--danger-color);
             background-color: var(--danger-pale);
             color: var(--danger-color);
-            border-radius: 5px;
-            width: 32px;
-            height: 32px;
-            margin-left: 6px;
+            border-radius: 0.5rem;
+            width: 2rem;
+            height: 2rem;
+            margin-left: 0.5rem;
 
             .icon {
                 font-size: 10pt;
