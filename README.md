@@ -12,8 +12,11 @@ fully functional.
 - 👽 No need for registering accounts, just type your name - or don't. Lorem-ipsum names are underrated ✌️
 - 🏀 It's real-time!
 
+![Website showing two questions with possible options](docs/overview_alpha1.png)
+
 ## Stack
 - PHP8.2
 - Laravel 11
 - Vue 3.4 bridged with InertiaJS
+- Laravel Echo for realtime updates
  
