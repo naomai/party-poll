@@ -130,7 +130,7 @@ const collapsed = ref(typeof questionDraft.uncommitted === "undefined" && !quest
                          <div class="text-container">
                             
                             <p v-if="collapsed">
-                                <div class="drag-handle">#{{ questionDraft.poll_sequence_id }}</div>
+                                <div class="drag-handle">{{ questionDraft.poll_sequence_id }}.</div>
                                 {{ questionDraft.question }}
                             </p>
                             <IconTextInput 

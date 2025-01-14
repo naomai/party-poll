@@ -23,6 +23,7 @@
 
     --app-island-outset-bg: oklch(from var(--app-island-bg) calc(l * 1.9) calc(c) h);
 
+    --app-confirm-bg: oklch(from var(--app-cue-confirm) calc(0.5) calc(c * 0.4) h);
 }
 
 html {

@@ -1,6 +1,4 @@
 #poll-summary {
-    --bg-section-hover: oklch(from var(--app-island-bg) calc(l + 0.1) calc(c - 0.0) h);
-    
 
     @media (min-width: 1024px) {
         padding-left: 2rem;
@@ -39,6 +37,9 @@
 
 #poll-summary ul.question-list {
     & > li {
+        --bg-section-hover: oklch(from var(--app-island-bg) calc(l + 0.1) calc(c - 0.0) h);
+        --accent-color: var(--app-primary-color);
+
         padding: 1.25rem 1.5rem;
         display: flex;
         justify-content: space-between;
@@ -62,6 +63,14 @@
 
         &.collapsed:hover:not(.edit-lock), & .collapse-chevron:hover {
             background-color: var(--bg-section-hover);
+        }
+
+        &.answered {
+            &, *{
+                --accent-color: oklch(from var(--app-primary-color) calc(0.6) calc(c * 0.4) h);
+                --app-island-bg: oklch(from var(--app-primary-color) calc(0.15) calc(c * 0.4) h);
+            }
+            background-color: var(--app-island-bg);
         }
 
         .question {
@@ -93,16 +102,20 @@
         .question .response-editor .option {
             --option-bg: oklch(from var(--app-island-bg) calc(l + 0.1) calc(c - 0.0) h);;
             --option-bar-bg: oklch(from var(--app-island-bg) calc(l + 0.2) calc(c - 0.0) h);;
+            --option-input-bg: oklch(from var(--app-island-bg) calc(l) calc(c - 0.0) h);;
 
+            
             position: relative;
-            border: 1px solid var(--option-bg);
+            border: 0.15rem solid transparent;
             background: var(--option-bg);
             border-radius: 0.5em;
 
             height: 2.5em;
             overflow: hidden;
             
-            margin-bottom: 0.5em;          
+            margin-bottom: 0.5em;   
+            
+            transition: border 0.3s ease-out;
             
             .controls {
                 position: absolute;
@@ -113,10 +126,11 @@
                 justify-content: space-between;
                 align-items: center;
 
-                padding: 0.3em 0.7em;
+                padding: 0.38em 0.7em;
                 
                 label {
                     width: 100%;
+                    padding: 0 0.2em;
                 }
                 z-index: 1;
             }
@@ -130,6 +144,42 @@
                 z-index: 0;
                 transition: width 0.5s ease-in;
             }
+
+            .chart-percentage {
+                z-index: 1;
+                position: absolute;
+                top: 0;
+                right: 0;
+                padding: 0.5em 0.6em;
+                font-size: 0.7em;
+                height: 100%;
+            }
+
+            &.selected {
+                border-color: var(--accent-color);
+                
+            }
+
+            input[type=radio] {
+                background-color:  var(--option-input-bg);
+                border-color: transparent;
+                transition: background-color 0.3s ease-out;
+                background-image: none;
+
+                &:focus {
+                    outline: none;
+                    box-shadow: 0px 0px 1px 2px var(--accent-color);
+                }
+                &:checked {
+                    background-color: var(--accent-color);
+                }
+            }
+
+
+        }
+
+        .confirm {
+            background-color: var(--app-confirm-bg);
         }
 
         &.processing .collapse-chevron {
@@ -260,15 +310,18 @@
 }
 
 #poll-summary .actions {
+    --poll-action-bg: oklch(from var(--app-cue-info) calc(0.3) calc(c * 0.6) h);
+    --poll-action-text: oklch(from var(--app-cue-info) calc(1) calc(c * 0.9) h);
+
     gap: 0.25rem;
-    align-items: flex-start;
+    justify-content: flex-end;
     display: flex;
     margin: 0.25rem 0;
     .action {
         width: 3em;
         height: 3em;
         --tw-bg-opacity: 1;
-        background-color: rgb(55 65 81 / var(--tw-bg-opacity));
+        background-color: var(--poll-action-bg);
         border-radius: 9999px;
         display: inline-flex;
 
@@ -287,7 +340,7 @@
         }
 
         svg {
-            fill: #fff;
+            fill: var(--poll-action-text);
             width: 70%;
             height: 70%;
             margin-top: 0.45rem;

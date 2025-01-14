@@ -36,6 +36,6 @@ const proxyChecked = computed({
         :name="group"
         :id="id"
         v-model="proxyChecked"
-        class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+        class="rounded shadow-sm"
     />
 </template>

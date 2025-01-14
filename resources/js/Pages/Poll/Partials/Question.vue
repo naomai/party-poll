@@ -52,12 +52,13 @@ const submit = () => {
 <template>
     <li 
         v-if="question.revealed"
-        :class="{collapsed: collapsed}"
+        :class="{collapsed: collapsed, answered: props.question.answer !== null }"
         @click="collapsed = !collapsed"
     >
         <div class="question">
             <div class="text-container">
                 <p>
+                    <div class="drag-handle">{{ question.poll_sequence_id }}. </div>
                     {{ question.question }}
                 </p>
                 <svg xmlns="http://www.w3.org/2000/svg" 
@@ -98,11 +99,13 @@ const submit = () => {
                             :locked="!rules.enable_revise_response && props.question.answer !== null"
                         />
                         <FormRating v-if="question.type=='rating'" :response-params="question.response_params" v-model="responseLocal"/>
-                        <div>
+                        <div v-if="props.question.answer === null">
                             <PrimaryButton
+                                class="confirm"
                                 :class="{ 'opacity-25': responseLocal == null || !responseLocal.valid || form.processing }"
                                 :disabled="responseLocal == null || !responseLocal.valid || form.processing"
                             >
+                                <i class="fa-solid fa-paper-plane"></i>
                                 OK
                             </PrimaryButton>
                         </div>

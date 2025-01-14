@@ -169,7 +169,7 @@ window.Echo.private('Poll.'+info.id)
             {{ info.title }}
             </h2>
         </template>
-        <div class="py-12">
+        <div class="py-4">
             <div id="poll-summary" 
                 class="app-islands"
                 :class="{editing: clientState.editing}"
