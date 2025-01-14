@@ -40,13 +40,18 @@ const canSeeAllQuestions = computed(() =>
     membership.modify_poll || membership.see_progress
 );
 
-const hasUnpublished = computed(()=>
+const unpublishedCount = computed(()=>
     questionsAll.reduce((a, current)=>
-        a ||
-        page.props.state.poll_state.published_seq === null ||
-        page.props.state.poll_state.published_seq < current.poll_sequence_id
-    , false)
+        a + (
+            page.props.state.poll_state.published_seq === null ||
+            page.props.state.poll_state.published_seq < current.poll_sequence_id 
+            ? 1
+            : 0
+        )
+    , 0)
 );
+
+const hasUnpublished = computed(()=>unpublishedCount.value > 0);
 
 const clientState = reactive({
     editing: false,
@@ -169,7 +174,6 @@ window.Echo.private('Poll.'+info.id)
                 class="app-islands"
                 :class="{editing: clientState.editing}"
             >
-                {{ hasUnpublished }}
                 <AllowedActions :membership="membership" v-model:client-state="clientState" />
                 <div
                     class="poll-questions app-island"
@@ -200,7 +204,7 @@ window.Echo.private('Poll.'+info.id)
                 <div v-else-if="!hasQuestionsToEdit && isAdmin" class="state-message">
                     Hey boss, there are no questions here. Go ahead and add some!
                 </div>
-                <div v-else-if="!hasQuestionsToAnswer" class="state-message">
+                <div v-else-if="!hasQuestionsToAnswer && !clientState.editing" class="state-message">
                     We don't have any questions yet. Come back soon!
                 </div>
                 <div v-else-if="hasQuestionsToAnswer && !hasMoreQuestions && page.props.state.question_id===null && !page.props.state.waiting_me" class="state-message">
@@ -208,13 +212,13 @@ window.Echo.private('Poll.'+info.id)
                 </div>
                 <div v-if="isAdmin && clientState.editing" class="edit-buttons self-center py-6">
                     <ListAddButton class="" @click="createQuestion()">New question</ListAddButton>
-                    <SecondaryButton v-if="hasUnpublished" @click="publishWarning.show()"><i class="fa-solid fa-person-chalkboard"></i> Reveal</SecondaryButton>
+                    <SecondaryButton v-if="hasUnpublished" @click="publishWarning.show()"><i class="fa-solid fa-person-chalkboard"></i> Reveal ({{ unpublishedCount }})</SecondaryButton>
                 </div>
                 <InlineWarning class="publish-warning" ref='publishWarning' @confirm="publishQuestions">Reveal questions? You won't be able to edit them.</InlineWarning>
             </div>
         </div>
     </div>
-    <pre v-if="true">
+    <pre v-if="false ">
         {{ page.props }}
     </pre>
     <Modal :show="clientState.viewingQr" @close="clientState.viewingQr = false">
