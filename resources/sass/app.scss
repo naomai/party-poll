@@ -31,6 +31,11 @@ html {
     }
 }
 
+nav {
+    background-color: var(--app-island-bg);
+    border-bottom: 1px solid var(--app-island-bg);
+}
+
 #app-backdrop {
     min-height: 100vh; 
     background-color: var(--app-backdrop); 
@@ -250,6 +255,10 @@ button {
         opacity: 0.6;
     }
 
+}
+
+.dropdown {
+    background-color: var(--app-island-bg);
 }
 
 button.add-item {
