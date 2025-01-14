@@ -34,11 +34,15 @@ const emit = defineEmits([
     'changed'
 ]);
 
+const selectMe = () => {
+    document.getElementById('rdb-'+props.form_id+'-'+props.index).click();
+};
+
 
 </script>
 
 <template>
-    <div class="option">
+    <div class="option" :class="{'selected': selected}" @click="()=>{selectMe()}">
         <div class="controls">
             <Radio v-if="!multiSelect"
                 :value="index" 
@@ -46,7 +50,7 @@ const emit = defineEmits([
                 :group="form_id"
                 :checked="selected"
                 :disabled="locked"
-                class="rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                class="rounded-lg shadow-sm"
                 @update:selected-id="($val)=>{emit('changed', $val, true)}" />
             <Checkbox v-if="multiSelect" 
                 :value="index"
@@ -58,7 +62,8 @@ const emit = defineEmits([
             <label :for="'rdb-'+form_id+'-'+index">{{ option.caption }}</label>
             <div v-if="maxVotes" class="percentage"></div>
         </div>
-        <div class="chart-bar" :style="{width: (votes/maxVotes*100) + '%'}"></div>
+        <div v-if="maxVotes!==0" class="chart-bar" :style="{width: (votes/maxVotes*100) + '%'}"></div>
+        <div v-if="maxVotes!==0" class="chart-percentage">{{ Math.round(votes/maxVotes*100) }}%</div>
     </div>
 
 </template>
