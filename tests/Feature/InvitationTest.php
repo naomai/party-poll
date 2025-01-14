@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Services\MembershipService;
 use App\Services\PollManagementService;
 use App\Services\PollStateService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -38,6 +39,24 @@ class InvitationTest extends TestCase {
         ;
 
         $this->assertTrue($poll->hasMember($user), "user is poll member after consuming invitation");
+    }
+
+    public function test_redirect_when_already_member(): void {
+        [$poll, $user] = $this->_prepareInvitationConditions();
+        $invitationToken = $poll->access_link_token;
+
+        $membershipSvc = $this->app->make(MembershipService::class);
+        $membershipSvc->create($poll, $user);
+
+        $this->assertTrue($poll->hasMember($user), "user is poll member");
+
+        $this->actingAs($user)
+        ->get(route('invite.view', [
+            'poll'=>$poll->id, 
+            'accesskey'=>$invitationToken,
+        ]))
+        ->assertRedirectToRoute('polls.show', ['poll'=>$poll->id])
+    ;
     }
 
     public function test_accept_invitation_fail_on_started_poll(): void {
