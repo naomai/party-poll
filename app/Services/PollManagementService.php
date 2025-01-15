@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use App\Events\QuestionsPublishedEvent;
 use App\Http\Resources\PollBasicInfoResource;
 use App\Http\Resources\PollSummaryResource;
 use App\Http\Resources\QuestionResource;
@@ -62,12 +63,18 @@ class PollManagementService {
 
     public function publishQuestions(Poll $poll) {
         PollStateService::ensureStateValidity($poll);
+        $previousSequenceId = $poll->published_sequence_id;
         $maxSequenceId = $poll->questions->max('poll_sequence_id');
         $poll->published_sequence_id = $maxSequenceId;
         if($poll->sequence_id === null && $maxSequenceId !== null) {
             $poll->sequence_id = 1;
         }
         $poll->save();
+
+        // EVENT
+        $publishedQuestions = $poll->questions->where('poll_sequence_id', '>', $previousSequenceId)->all();
+
+        QuestionsPublishedEvent::dispatch($poll, $publishedQuestions);
     }
 
     public function regenerateInvitationToken(Poll $poll) : string {

@@ -18,10 +18,15 @@ class QuestionResource extends JsonResource
      */
     public function toArray(Request $request): array {
         $owner = new UserSummaryResource(User::find($this->owner_id));
-        $answer = Answer::where([
-            ['user_id','=', Auth::user()->id],
-            ['question_id', '=', $this->id],
-        ])->first();
+        $user = Auth::user();
+
+        $answer=null;
+        if($user!==null) {
+            $answer = Answer::where([
+                ['user_id','=', $user->id],
+                ['question_id', '=', $this->id],
+            ])->first();
+        }
 
         $answersTotal = null;
         $answerStats = null;

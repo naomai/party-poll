@@ -155,6 +155,10 @@ window.Echo.private('Poll.'+info.id)
             
         }
     })
+    .listen('.poll.publish', (e) => {
+        questions.push(...e.questions);
+        info.question_count = e.question_count;
+    })
 //});
 
 </script>

@@ -27,9 +27,7 @@ const props = defineProps({
 const responseLocal = ref(props.question.answer!=null ? props.question.answer : null);
 
 const collapsed = ref( 
-    (props.question.answer !== null 
-    || !props.question.revealed
-    ) && props.pollState.blocking_id != props.question.id 
+    props.question.answer !== null && props.pollState.blocking_id != props.question.id 
 );
 
 const form = useForm({
@@ -59,7 +57,6 @@ watch(responseLocal, () => {
 
 <template>
     <li 
-        v-if="question.revealed"
         :class="{collapsed: collapsed, answered: props.question.answer !== null }"
         @click="collapsed = !collapsed"
     >
@@ -95,7 +92,7 @@ watch(responseLocal, () => {
                     class="response-editor"
                     @click.stop=""
                 >
-                    <form v-if="question.revealed"
+                    <form 
                         @submit.prevent="submit"
                     >
                         <FormRange v-if="question.type=='range'" :response-params="question.response_params" v-model="responseLocal"/>
