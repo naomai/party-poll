@@ -22,7 +22,7 @@ const questionsAll = reactive(page.props.questions_privileged);
 const membership = page.props.membership;
 
 const hasQuestionsToAnswer = computed(() =>
-    questions.length > 0
+    questions.length > 0 && page.props.state.question_id !== null
 );
 const hasQuestionsToEdit = computed(() =>
     questionsAll.length > 0
@@ -33,6 +33,7 @@ onUpdated(()=>{
 });
 
 
+const pollStarted = ref(page.props.state.poll_state.started);
 const hasMoreQuestions = ref(page.props.state.more_questions);
 
 const isAdmin = computed(() => membership.modify_poll);
@@ -201,13 +202,13 @@ window.Echo.private('Poll.'+info.id)
                 <div v-if="hasMoreQuestions && !page.props.state.waiting_me && page.props.state.waiting_others" class="state-message">
                     Waiting for others... ({{ page.props.state.others_responses_left }})
                 </div>
-                <div v-else-if="!hasQuestionsToEdit && isAdmin" class="state-message">
+                <div v-else-if="!pollStarted && !hasQuestionsToEdit && isAdmin" class="state-message">
                     Hey boss, there are no questions here. Go ahead and add some!
                 </div>
-                <div v-else-if="!hasQuestionsToAnswer && !clientState.editing" class="state-message">
+                <div v-else-if="!pollStarted && !hasQuestionsToAnswer && !clientState.editing" class="state-message">
                     We don't have any questions yet. Come back soon!
                 </div>
-                <div v-else-if="hasQuestionsToAnswer && !hasMoreQuestions && page.props.state.question_id===null && !page.props.state.waiting_me" class="state-message">
+                <div v-else-if="!hasQuestionsToAnswer && !hasMoreQuestions && !page.props.state.waiting_me" class="state-message">
                     No more questions for you. Come back soon!
                 </div>
                 <div v-if="isAdmin && clientState.editing" class="edit-buttons self-center py-6">
@@ -218,7 +219,7 @@ window.Echo.private('Poll.'+info.id)
             </div>
         </div>
     </div>
-    <pre v-if="false ">
+    <pre v-if="true ">
         {{ page.props }}
     </pre>
     <Modal :show="clientState.viewingQr" @close="clientState.viewingQr = false">

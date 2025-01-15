@@ -1,5 +1,5 @@
 <script setup>
-import { computed, reactive, ref } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import FormRange from './FormRange.vue';
 import FormInput from './FormInput.vue';
 import FormSelect from './FormSelect.vue';
@@ -46,6 +46,14 @@ const submit = () => {
         preserveScroll: true,
     });
 };
+
+const instantSubmit = ref(!props.rules.wait_for_everybody);
+
+watch(responseLocal, () => {
+    if(instantSubmit.value) {
+        submit();
+    }
+});
 
 </script>
 
@@ -96,10 +104,10 @@ const submit = () => {
                             :response-params="question.response_params" 
                             v-model="responseLocal"
                             :stats="question.stats"
-                            :locked="!rules.enable_revise_response && props.question.answer !== null"
+                            :locked="!rules.enable_revise_response && props.question.answer !== null && !instantSubmit"
                         />
                         <FormRating v-if="question.type=='rating'" :response-params="question.response_params" v-model="responseLocal"/>
-                        <div v-if="props.question.answer === null">
+                        <div v-if="!instantSubmit && props.question.answer === null">
                             <PrimaryButton
                                 class="confirm"
                                 :class="{ 'opacity-25': responseLocal == null || !responseLocal.valid || form.processing }"

@@ -193,7 +193,14 @@ class PollStateService {
      * member answered all the questions.
      */
     public static function getCurrentQuestion(Membership $membership): ?Question {
-        $question = static::getAccessibleQuestions($membership)->last();
+        //$question = static::getAccessibleQuestions($membership)->last();
+        $questionPair = static::getQuestionAnswerPairsSequence($membership)
+            ->filter(fn($q)=>$q['answer']===null)->first();
+
+        if($questionPair===null) {
+            return null;
+        }
+        $question=$questionPair['question'];
         /*if($question->answers->where('user_id', '=', $membership->user->id)->count() != 0) {
             return null;
         }*/
@@ -232,7 +239,7 @@ class PollStateService {
      * Gets collection of all questions currently accesible to a member
      * Depending on poll type, fetch questions up to:
      * - Synchronous: blocking question that's waiting for answers from others
-     * - Asynchronous: first unanswered by the member
+     * - Asynchronous: all published questions
      */
     public static function getAccessibleQuestions(Membership $membership): ?Collection {
         /** @var Poll */
@@ -255,7 +262,7 @@ class PollStateService {
             $sequenceId = null;
             $questionStates = static::getQuestionAnswerPairsSequence($membership);
 
-            $firstWithoutAnswer = $questionStates->first(
+            /*$firstWithoutAnswer = $questionStates->first(
                 fn($state) => $state['answer']==null
             );
 
@@ -265,7 +272,8 @@ class PollStateService {
             }else{
                 // all questions answered
                 $sequenceId = 999999;
-            }
+            }*/
+            $sequenceId = $poll->published_sequence_id;
         }
         if($sequenceId === null) {
             return collect([]);
