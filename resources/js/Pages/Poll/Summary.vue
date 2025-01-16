@@ -223,7 +223,7 @@ window.Echo.private('Poll.'+info.id)
             </div>
         </div>
     </div>
-    <pre v-if="true ">
+    <pre v-if="false ">
         {{ page.props }}
     </pre>
     <Modal :show="clientState.viewingQr" @close="clientState.viewingQr = false">

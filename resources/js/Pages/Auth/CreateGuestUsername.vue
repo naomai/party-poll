@@ -29,7 +29,7 @@ const pageProps = usePage().props;
                 class=" shadow-md sm:max-w-md sm:rounded-lg py-4 my-3 border  border-purple-400"
              />
         </div>
-        <form @submit.prevent="submit">
+        <form @submit.prevent="submit" class="block w-full">
             <div>
                 <InputLabel for="name" value="Would you like to introduce yourself first?" />
 
@@ -49,7 +49,7 @@ const pageProps = usePage().props;
             <div class="mt-4 flex items-center justify-end">
                 <Link
                     :href="route('login')"
-                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    class="rounded-md text-sm underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
                     Duh, already registered
                 </Link>
