@@ -14,6 +14,23 @@ fully functional.
 
 ![Website showing two questions with possible options](docs/overview_alpha1.png)
 
+## Installation
+
+```
+composer install
+npm install
+php artisan reverb:install
+```
+
+Single container Docker version is planned
+
+## Running
+
+```
+php artisan reverb:start
+php artisan queue:work 
+```
+
 ## Stack
 - PHP8.2
 - Laravel 11
