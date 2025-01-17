@@ -20,11 +20,23 @@ class QuestionService {
             'user_id' => Auth::user()->id,
             'response' => json_encode($validated['answer']),
         ];
-        Answer::upsert(
-            [$answerRecord], 
-            uniqueBy: ['question_id', 'user_id'], 
-            update: ['response']
-        );
+        if($question->type == 'select' 
+            && count($validated['answer']['selected'])==0
+        ) {
+            Answer::where([
+                ['question_id', '=', $question->id],
+                ['user_id', '=', Auth::user()->id],
+            ])->delete();
+        } else {
+            Answer::upsert(
+                [$answerRecord], 
+                uniqueBy: ['question_id', 'user_id'], 
+                update: ['response']
+            );
+
+        }
+
+        PollStateService::ensureStateValidity($question->poll);
 
         QuestionStatsUpdateEvent::dispatch($question);
     }
@@ -57,6 +69,8 @@ class QuestionService {
                     fn($cumulative, $answer) => array_merge($cumulative, $answer->response->selected),
                     []
                 );
+
+                $stats['votes'] = count($allSelections);
                 
                 // create histogram of all selections
                 $stats['options'] = array_reduce(
@@ -128,8 +142,8 @@ class QuestionService {
                 }
                 
                 return [
-                    'answer.selected'=>["required", "array", "between:1,{$maxSelected}"],
-                    'answer.selected.*'=>["required", "integer", "between:0,{$maxAnswerId}"],
+                    'answer.selected'=>["nullable", "array", "between:0,{$maxSelected}"],
+                    'answer.selected.*'=>["integer", "between:0,{$maxAnswerId}"],
                 ];
         }
     }

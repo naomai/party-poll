@@ -15,7 +15,7 @@ class QuestionStoreRequest extends FormRequest {
         return [
             'question' => ['required', 'string', 'max:255'],
             'type' => ['required', Rule::in(['input','range','rating','select'])],
-            'response_params' => ['required', 'array'],
+            'response_params' => ['array', 'nullable'],
             
             'response_params.type' => ['exclude_unless:type,input','required', Rule::in(['text','pass','longtext'])],
             'response_params.max_length' => ['exclude_unless:type,input','required', 'integer', "between: 0, 1000"],
