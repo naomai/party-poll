@@ -42,7 +42,7 @@ const selectMe = () => {
 </script>
 
 <template>
-    <div class="option" :class="{'selected': selected}" @click="()=>{selectMe()}">
+    <div class="option" :class="{'selected': selected}" @click.capture="(e)=>{selectMe();}">
         <div class="controls">
             <Radio v-if="!multiSelect"
                 :value="index" 
