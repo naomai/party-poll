@@ -17,7 +17,7 @@ const props = defineProps({
 });
 
 const options = ref(props.responseParams.options);
-const selectionQueue = ref([]);
+const selectionQueue = ref(model.value!==null ? model.value.selected : []);
 
 const selectedMax = ref(props.responseParams.max_selected);
 
@@ -35,6 +35,8 @@ const optionChanged = (id, value) => {
         model.value = wrapAnswer([id]);
         return;
     }
+
+    console.log(`${id} : ${value}`);
 
     const sel = selectionQueue.value;
     if(value) {

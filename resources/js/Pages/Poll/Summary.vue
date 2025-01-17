@@ -29,7 +29,9 @@ const hasQuestionsToEdit = computed(() =>
 );
 
 onUpdated(()=>{
-    questions.value = page.props.questions;
+    //questions.value = page.props.questions;
+    questions.splice(0,questions.length);
+    questions.push(...page.props.questions);
 });
 
 
