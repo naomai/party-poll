@@ -112,11 +112,19 @@
 
             height: 2.5em;
             overflow: hidden;
-            
+                        
             margin-bottom: 0.5em;   
+
+            filter: brightness(100%);
             
-            transition: border 0.3s ease-out;
+            transition-property: border, filter; 
+            transition-duration: 0.3s;
+            transition-timing-function: ease-out;
             
+            &, & * {
+                cursor: pointer;
+            }
+
             .controls {
                 position: absolute;
                 top: 0;
@@ -142,7 +150,7 @@
                 height: 100%;
                 background-color: var(--option-bar-bg);
                 z-index: 0;
-                transition: width 0.5s ease-in;
+                transition: width 0.3s ease-in-out;
             }
 
             .chart-percentage {
@@ -158,6 +166,10 @@
             &.selected {
                 border-color: var(--accent-color);
                 
+            }
+
+            &:hover {
+                filter: brightness(140%);
             }
 
             input[type=radio] {
