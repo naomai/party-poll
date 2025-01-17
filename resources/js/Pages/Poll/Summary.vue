@@ -16,7 +16,7 @@ import InlineWarning from '@/Components/InlineWarning.vue';
 
 
 const page = usePage();
-const info = page.props.info;
+const info = reactive(page.props.info);
 const questions = reactive(page.props.questions);
 const questionsAll = reactive(page.props.questions_privileged);
 const membership = page.props.membership;
@@ -141,6 +141,7 @@ const publishQuestions = () => {
         only: ['info', 'state', 'questions', 'questionsAll'], 
         preserveState: true,
         preserveScroll: true,
+        preserveUrl: true, 
     });
 };
 
