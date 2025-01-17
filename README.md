@@ -1,4 +1,6 @@
 # Party Poll
+<img alt='Pizza sliced into parts reminescent of pie chart' src='docs/pizza-svgrepo-com.svg' style="float: right; width: 150px;"/>
+
 ## About
 Quickly ask your friends about anything 🍕🪩🎵🎄 
 
