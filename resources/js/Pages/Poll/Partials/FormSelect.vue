@@ -36,8 +36,6 @@ const optionChanged = (id, value) => {
         return;
     }
 
-    console.log(`${id} : ${value}`);
-
     const sel = selectionQueue.value;
     if(value) {
         sel.push(id);

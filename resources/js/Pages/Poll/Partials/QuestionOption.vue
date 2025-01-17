@@ -34,15 +34,19 @@ const emit = defineEmits([
     'changed'
 ]);
 
-const selectMe = () => {
-    document.getElementById('rdb-'+props.form_id+'-'+props.index).click();
+const selectMe = (e) => {
+    let box = document.getElementById('rdb-'+props.form_id+'-'+props.index);
+
+    if(!e.target.matches('input[type="checkbox"], input[type="radio"], label')) {
+        box.click();
+    }
 };
 
 
 </script>
 
 <template>
-    <div class="option" :class="{'selected': selected}" @click.capture="(e)=>{selectMe();}">
+    <div class="option" :class="{'selected': selected}" @click.capture="(e)=>{selectMe(e);}">
         <div class="controls">
             <Radio v-if="!multiSelect"
                 :value="index" 
