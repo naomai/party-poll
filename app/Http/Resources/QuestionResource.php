@@ -45,7 +45,7 @@ class QuestionResource extends JsonResource
             'owner' => $owner,
             'answer' => $answer!==null ? $answer->response : null,
             'revealed' => $this->revealed,
-            'answers_total' => $answersTotal,
+            //'answers_total' => $answersTotal,
             'stats' => $answerStats
         ];
     }
