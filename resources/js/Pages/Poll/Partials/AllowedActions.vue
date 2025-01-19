@@ -39,6 +39,7 @@ const toggleEditor = ()=>{
         </div>
         -->
         <div 
+            v-if="!membership.modify_poll"
             class="action edit" 
             :class="{
                 'forbidden': !membership.modify_poll,
